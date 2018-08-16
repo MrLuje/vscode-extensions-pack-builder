@@ -4,8 +4,9 @@ import * as path from "path";
 import { AskMultiple, GetGitUserName } from "./helper";
 import * as sanitizefilename from "sanitize-filename";
 import { EnsureExtensionPackFactory, PackageExtension } from "./packFactory";
+import { log } from "./log";
 
-const EXTENSION_FOLDER = "vscode-project-extentions-templates";
+const EXTENSION_FOLDER = "vscode-extentions-pack-builder";
 
 export interface Extension {
   label: string;
@@ -14,6 +15,7 @@ export interface Extension {
 
 export interface PackOptions {
   factoryFolder: string;
+  extensionPath: string;
   packageName: string;
   packageId: string;
   publisher: string;
@@ -26,6 +28,10 @@ export async function CreatePack(context: vscode.ExtensionContext) {
     vscode.window.showErrorMessage(`No storage path available to build extensions, please report an issue !`);
     return;
   }
+
+  log.appendLine(`* Creating a new pack !`);
+  log.appendLine(` - Storage path: ${storagePath}`);
+  log.appendLine(` - Extension path: ${context.extensionPath}`);
 
   let packNameRaw = await vscode.window.showInputBox({ placeHolder: "What is the name of your pack ?" });
   if (!packNameRaw) {
@@ -69,24 +75,27 @@ export async function CreatePack(context: vscode.ExtensionContext) {
     packageName: packName,
     publisher: publisher,
     extensions: selectedExtensions,
-    factoryFolder: path.join(path.dirname(storagePath), EXTENSION_FOLDER)
+    factoryFolder: path.join(path.dirname(storagePath), EXTENSION_FOLDER),
+    extensionPath: context.extensionPath
   };
 
-  ProcessPackCreation(storagePath, context, options);
+  ProcessPackCreation(context, options);
 }
 
-function ProcessPackCreation(storagePath: string, context: vscode.ExtensionContext, options: PackOptions) {
+function ProcessPackCreation(context: vscode.ExtensionContext, options: PackOptions) {
   vscode.window.withProgress(
     { location: vscode.ProgressLocation.Notification, title: "Building extension pack..." },
     async (progress, token) => {
       if (token.isCancellationRequested) {
         return;
       }
-      let success = await EnsureExtensionPackFactory(context, options);
+      log.appendLine(` Building extensions factory...`);
+      let success = await EnsureExtensionPackFactory(options);
       if (!success || token.isCancellationRequested) {
         return;
       }
 
+      log.appendLine(` Creating the extension...`);
       let packSuccess;
       try {
         packSuccess = await PackageExtension(path.join(options.factoryFolder, options.packageId), options.packageId);
@@ -99,12 +108,14 @@ function ProcessPackCreation(storagePath: string, context: vscode.ExtensionConte
 
       // set it as done so the progress window is done
       progress.report({ increment: 100 });
+      log.appendLine(` Installing the extension...`);
 
       try {
         await InstallVSIX(vscode.Uri.file(path.join(options.factoryFolder, options.packageId, "build", `${options.packageId}.vsix`)));
       } catch (err) {
         vscode.window.showErrorMessage("Failed to install the pack...\n" + err);
       }
+      log.appendLine(` Done`);
     }
   );
 }

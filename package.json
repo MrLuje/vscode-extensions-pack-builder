@@ -1,13 +1,15 @@
 {
-    "name": "vscode-project-extentions-templates",
-    "displayName": "vscode-project-extentions-templates",
+    "name": "vscode-extentions-pack-builder",
+    "displayName": "Extentions Pack builder",
     "description": "Define a list of enabled extensions that you can save and re-apply to another project",
     "version": "0.0.1",
     "publisher": "MrLuje",
+    "license": "MIT",
     "engines": {
         "vscode": "^1.22.0"
     },
     "icon": "images/icon.png",
+    "repository": "https://github.com/MrLuje/vscode-extensions-pack-builder",
     "categories": [
         "Other"
     ],
@@ -30,7 +32,7 @@
         "copy_files": "copyfiles -f src/extension_readme.md src/extension_package.json images/pack_icon.png out",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "npm run compile && node ./node_modules/vscode/bin/test",
-        "build": "vsce package -o ./build/vscode-project-extentions-templates.vsix"
+        "build": "vsce package -o ./build/vscode-extentions-pack-builder.vsix"
     },
     "devDependencies": {
         "@types/mocha": "^2.2.42",

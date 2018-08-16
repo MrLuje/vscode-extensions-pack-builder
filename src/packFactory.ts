@@ -6,11 +6,7 @@ import * as os from "os";
 import { child_process } from "./child_process";
 import { PackOptions } from "./commands";
 
-export async function EnsureExtensionPackFactory(context: vscode.ExtensionContext, options: PackOptions) {
-  if (!context.storagePath) {
-    return false;
-  }
-  // sanitizefilename
+export async function EnsureExtensionPackFactory(options: PackOptions) {
   const extensionDisplayName = options.packageName;
   const extensionTemplatePath = path.join(options.factoryFolder, options.packageId);
 
@@ -40,7 +36,7 @@ export async function EnsureExtensionPackFactory(context: vscode.ExtensionContex
   }
 
   // update readme
-  let rd = fs.readFileSync(path.join(context.extensionPath, "out", "extension_readme.md"), "UTF-8");
+  let rd = fs.readFileSync(path.join(options.extensionPath, "out", "extension_readme.md"), "UTF-8");
   rd = rd
     .replace("#packageName#", options.packageName)
     .replace(
@@ -50,10 +46,10 @@ export async function EnsureExtensionPackFactory(context: vscode.ExtensionContex
   fs.writeFileSync(path.join(extensionTemplatePath, "README.md"), rd);
 
   // update package.json
-  let pkJson = fs.readFileSync(path.join(context.extensionPath, "out", "extension_package.json"));
+  let pkJson = fs.readFileSync(path.join(options.extensionPath, "out", "extension_package.json"));
   fs.writeFileSync(path.join(extensionTemplatePath, "package.json"), pkJson);
 
-  let file = prfs.readFileSync(path.join(context.extensionPath, "out", "extension_package.json"), "UTF-8");
+  let file = prfs.readFileSync(path.join(options.extensionPath, "out", "extension_package.json"), "UTF-8");
   file = file
     .replace("#extension-name#", options.packageId)
     .replace("#extension-displayname#", options.packageName)
