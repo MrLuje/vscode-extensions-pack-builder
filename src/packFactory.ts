@@ -42,9 +42,9 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
 
   let rd = fs.readFileSync(path.join(options.extensionPath, "out", "extension_readme.md"), "UTF-8");
   rd = rd
-    .replace("#packageName#", options.packageName)
+    .replace("%packageName%", options.packageName)
     .replace(
-      "#extension-list#",
+      "%extension-list%",
       options.extensions.map(ext => `${ext.label} (${ext.id})`).reduce((prev, cur, i) => (prev += `- ${cur}${os.EOL}`), "")
     );
   fs.writeFileSync(path.join(extensionTemplatePath, "README.md"), rd);

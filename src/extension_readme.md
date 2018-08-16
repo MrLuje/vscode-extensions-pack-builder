@@ -1,7 +1,7 @@
-# Extension Pack - #packageName
+# Extension Pack - %packageName%
 
 This pack contains the following extensions :
-#extension-list#
+%extension-list%
 
 By enabling or disabling this pack, it also affect all related extensions
 
