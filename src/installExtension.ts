@@ -15,9 +15,13 @@ export async function InstallVSIX(file: vscode.Uri) {
   term.sendText(`${command} --install-extension ${file.fsPath}`, true);
   term.show(false);
 
-  vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: "test" }, (progress, token) => {
-    return new Promise((ok, nok) => {});
+  const option = await vscode.window.showInformationMessage("Installing extension... Once done, a restart is needed.", {
+    title: "Reload now"
   });
 
-  await vscode.window.showInformationMessage("Installing extension...");
+  if (!option || option.title !== "Reload now") {
+    return;
+  }
+
+  vscode.commands.executeCommand("workbench.action.reloadWindow");
 }

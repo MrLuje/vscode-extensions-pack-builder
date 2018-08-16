@@ -1,24 +1,23 @@
 import { InstallVSIX } from "./installExtension";
 import * as vscode from "vscode";
 import * as path from "path";
-import * as fs from "fs";
 import { AskMultiple, GetGitUserName } from "./helper";
 import * as sanitizefilename from "sanitize-filename";
-import { prfs } from "./fs";
-import { child_process } from "./child_process";
+import { EnsureExtensionPackFactory, PackageExtension } from "./packFactory";
 
 const EXTENSION_FOLDER = "vscode-project-extentions-templates";
 
-interface extension {
+export interface Extension {
   label: string;
   id: string;
 }
 
-interface packOptions {
-  packname: string;
-  packid: string;
+export interface PackOptions {
+  factoryFolder: string;
+  packageName: string;
+  packageId: string;
   publisher: string;
-  extensions: extension[];
+  extensions: Extension[];
 }
 
 export async function CreatePack(context: vscode.ExtensionContext) {
@@ -34,7 +33,7 @@ export async function CreatePack(context: vscode.ExtensionContext) {
   }
   let packName = packNameRaw;
 
-  let selectedExtensions: extension[] = [];
+  let selectedExtensions: Extension[] = [];
 
   await AskMultiple(
     "Select the extensions you want to pack :",
@@ -47,7 +46,7 @@ export async function CreatePack(context: vscode.ExtensionContext) {
         };
       })
       .sort((a: { label: string }, b: { label: string }) => a.label.localeCompare(b.label)),
-    res => (selectedExtensions = <extension[]>res)
+    res => (selectedExtensions = <Extension[]>res)
   );
 
   if (selectedExtensions.length === 0) {
@@ -65,87 +64,47 @@ export async function CreatePack(context: vscode.ExtensionContext) {
     publisher = pub;
   }
   publisher = publisher.trim();
+  const options = {
+    packageId: sanitizefilename(packName),
+    packageName: packName,
+    publisher: publisher,
+    extensions: selectedExtensions,
+    factoryFolder: path.join(path.dirname(storagePath), EXTENSION_FOLDER)
+  };
 
+  ProcessPackCreation(storagePath, context, options);
+}
+
+function ProcessPackCreation(storagePath: string, context: vscode.ExtensionContext, options: PackOptions) {
   vscode.window.withProgress(
     { location: vscode.ProgressLocation.Notification, title: "Building extension pack..." },
     async (progress, token) => {
-      progress.report({ message: "Creating extension factory...", increment: 50 });
-      let extensionPath = path.join(path.dirname(storagePath), EXTENSION_FOLDER);
-
-      const options = { packid: sanitizefilename(packName), packname: packName, publisher: publisher, extensions: selectedExtensions };
-
       if (token.isCancellationRequested) {
         return;
       }
-      await EnsureExtensionPackFactory(context, extensionPath, options);
-
-      if (token.isCancellationRequested) {
+      let success = await EnsureExtensionPackFactory(context, options);
+      if (!success || token.isCancellationRequested) {
         return;
       }
-      progress.report({ message: "Packaging the pack...", increment: 20 });
-      await PackageExtension(extensionPath, options.packid);
 
-      if (token.isCancellationRequested) {
+      let packSuccess;
+      try {
+        packSuccess = await PackageExtension(path.join(options.factoryFolder, options.packageId), options.packageId);
+      } catch (err) {
+        vscode.window.showErrorMessage("Failed to generate the pack...\n" + err);
+      }
+      if (!packSuccess || token.isCancellationRequested) {
         return;
       }
-      progress.report({ message: "Installing the pack...", increment: 20 });
-      InstallVSIX(vscode.Uri.file(path.join(extensionPath, options.packid, "build", `${options.packid}.vsix`)));
 
-      progress.report({ message: "Done...", increment: 10 });
+      // set it as done so the progress window is done
+      progress.report({ increment: 100 });
+
+      try {
+        await InstallVSIX(vscode.Uri.file(path.join(options.factoryFolder, options.packageId, "build", `${options.packageId}.vsix`)));
+      } catch (err) {
+        vscode.window.showErrorMessage("Failed to install the pack...\n" + err);
+      }
     }
   );
-}
-
-async function EnsureExtensionPackFactory(context: vscode.ExtensionContext, factoryFolder: string, options: packOptions) {
-  if (!context.storagePath) {
-    return false;
-  }
-  // sanitizefilename
-  const extensionDisplayName = options.packname;
-  const extensionTemplatePath = path.join(factoryFolder, options.packid);
-
-  if (await !prfs.exists(factoryFolder)) {
-    await prfs.mkdir(factoryFolder);
-  }
-
-  // install extension generator
-  await child_process.exec("npm i yo generator-code", { cwd: factoryFolder });
-
-  if (await !prfs.exists(path.join(extensionTemplatePath, "README.md"))) {
-    // generate extension
-    let cmd = `yo code --extensionName="${
-      options.packid
-    }" --extensionDescription="Template to build extension packs" --extensionType=extensionpack --extensionDisplayName="${extensionDisplayName}" --extensionPublisher="${
-      options.publisher
-    }" --extensionParam="n"`;
-    await child_process.exec(cmd, { cwd: factoryFolder });
-  }
-
-  // update readme
-  let rs = fs.createReadStream(path.join(context.extensionPath, "out", "extension_readme.md"));
-  let ws = fs.createWriteStream(path.join(extensionTemplatePath, "README.md"));
-  rs.pipe(ws);
-
-  // update package.json
-  rs = fs.createReadStream(path.join(context.extensionPath, "out", "extension_package.json"));
-  ws = fs.createWriteStream(path.join(extensionTemplatePath, "package.json"));
-  rs.pipe(ws);
-
-  let file = await prfs.readFile(path.join(context.extensionPath, "out", "extension_package.json"), "UTF-8");
-  file = file
-    .replace("#extension-name#", options.packid)
-    .replace("#extension-displayname#", options.packname)
-    .replace("#extension-publisher#", options.publisher)
-    .replace("#extension-list#", '"pwet pwe"');
-  fs.writeFileSync(path.join(extensionTemplatePath, "package.json"), file, "UTF-8");
-
-  if (await !prfs.exists(path.join(extensionTemplatePath, "build"))) {
-    await prfs.mkdir(path.join(extensionTemplatePath, "build"));
-  }
-
-  return true;
-}
-
-async function PackageExtension(extensionPath: string, extensionName: string) {
-  child_process.exec(`npx vsce package -o build/extension-template.vsix`, { cwd: path.join(extensionPath, extensionName) });
 }
