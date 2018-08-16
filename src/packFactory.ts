@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as prfs from "fs";
 import * as path from "path";
 import * as os from "os";
-import { child_process } from "./child_process";
+import { child_process } from "./node_async/child_process";
 import { PackOptions } from "./commands";
 import { log } from "./log";
 
