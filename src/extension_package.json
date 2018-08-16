@@ -1,0 +1,16 @@
+{
+    "name": "#extension-name#",
+    "displayName": "#extension-displayname#",
+    "description": "Template to build extension packs",
+    "version": "0.0.1",
+    "publisher": "#extension-publisher#",
+    "engines": {
+        "vscode": "^1.26.0"
+    },
+    "categories": [
+        "Extension Packs"
+    ],
+    "extensionPack": [
+        #extension-list#
+    ]
+}

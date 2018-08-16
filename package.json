@@ -1,0 +1,56 @@
+{
+    "name": "vscode-project-extentions-templates",
+    "displayName": "vscode-project-extentions-templates",
+    "description": "Define a list of enabled extensions that you can save and re-apply to another project",
+    "version": "0.0.1",
+    "publisher": "MrLuje",
+    "engines": {
+        "vscode": "^1.22.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:extension.exportList",
+        "onCommand:extension.applyList",
+        "onCommand:extension.createPack"
+    ],
+    "main": "./out/extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "extension.exportList",
+                "title": "Project extensions template: Export current extensions list"
+            },
+            {
+                "command": "extension.applyList",
+                "title": "Project extensions template: Apply an extensions list"
+            },
+            {
+                "command": "extension.createPack",
+                "title": "Extensions pack: Create pack"
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile && npm run copy_files",
+        "compile": "tsc -p ./",
+        "watch": "npm run copy_files && tsc -watch -p ./",
+        "copy_files": "copyfiles -f src/extension_readme.md src/extension_package.json out",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "npm run compile && node ./node_modules/vscode/bin/test",
+        "build": "vsce package -o ./build/vscode-project-extentions-templates.vsix"
+    },
+    "devDependencies": {
+        "@types/mocha": "^2.2.42",
+        "@types/node": "^8.9.4",
+        "@types/sanitize-filename": "^1.1.28",
+        "copyfiles": "^2.0.0",
+        "tslint": "^5.8.0",
+        "typescript": "^2.6.1",
+        "vscode": "^1.1.6"
+    },
+    "dependencies": {
+        "sanitize-filename": "^1.6.1"
+    }
+}
