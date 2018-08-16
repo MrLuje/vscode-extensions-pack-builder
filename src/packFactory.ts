@@ -18,7 +18,7 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
   // install extension generator
   if (!prfs.existsSync(path.join(options.factoryFolder, "node_modules"))) {
     log.appendLine(`  - Installing generators...`);
-    await child_process.exec("npm i yo generator-code", { cwd: options.factoryFolder });
+    await child_process.exec("npm i yo https://github.com/mrluje/vscode-generator-code.git#fix", { cwd: options.factoryFolder });
   }
 
   if (!prfs.existsSync(path.join(extensionTemplatePath, "README.md"))) {
