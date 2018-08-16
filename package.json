@@ -7,25 +7,16 @@
     "engines": {
         "vscode": "^1.22.0"
     },
+    "icon": "images/icon.png",
     "categories": [
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.exportList",
-        "onCommand:extension.applyList",
         "onCommand:extension.createPack"
     ],
     "main": "./out/extension",
     "contributes": {
         "commands": [
-            {
-                "command": "extension.exportList",
-                "title": "Project extensions template: Export current extensions list"
-            },
-            {
-                "command": "extension.applyList",
-                "title": "Project extensions template: Apply an extensions list"
-            },
             {
                 "command": "extension.createPack",
                 "title": "Extensions pack: Create pack"
@@ -36,7 +27,7 @@
         "vscode:prepublish": "npm run compile && npm run copy_files",
         "compile": "tsc -p ./",
         "watch": "npm run copy_files && tsc -watch -p ./",
-        "copy_files": "copyfiles -f src/extension_readme.md src/extension_package.json out",
+        "copy_files": "copyfiles -f src/extension_readme.md src/extension_package.json images/pack_icon.png out",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "npm run compile && node ./node_modules/vscode/bin/test",
         "build": "vsce package -o ./build/vscode-project-extentions-templates.vsix"
