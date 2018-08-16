@@ -62,7 +62,8 @@ export async function CreatePack(context: vscode.ExtensionContext) {
   let publisher = "";
   try {
     publisher = await GetGitUserName();
-  } catch {
+  } catch (err) {
+    log.appendLine(` - Can't get git user.name - ${err}`);
     let pub = await vscode.window.showInputBox({ prompt: `What\'s your publisher name ? (it will only be used as pack author)` });
     if (!pub) {
       return;
