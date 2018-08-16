@@ -62,6 +62,8 @@ export async function EnsureExtensionPackFactory(context: vscode.ExtensionContex
 
   let packageJson = JSON.parse(file);
   packageJson.repository = extensionTemplatePath;
+  // TODO enable later
+  // packageJson.icon = path.join(context.extensionPath, "out", "pack_icon.png");
 
   fs.writeFileSync(path.join(extensionTemplatePath, "package.json"), JSON.stringify(packageJson), "UTF-8");
 
