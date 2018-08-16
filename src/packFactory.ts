@@ -5,6 +5,7 @@ import * as path from "path";
 import * as os from "os";
 import { child_process } from "./child_process";
 import { PackOptions } from "./commands";
+import { log } from "./log";
 
 export async function EnsureExtensionPackFactory(options: PackOptions) {
   const extensionDisplayName = options.packageName;
@@ -16,6 +17,7 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
 
   // install extension generator
   if (!prfs.existsSync(path.join(options.factoryFolder, "node_modules"))) {
+    log.appendLine(`  - Installing generators...`);
     await child_process.exec("npm i yo generator-code", { cwd: options.factoryFolder });
   }
 
@@ -28,6 +30,7 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
     }" --extensionParam="n"`;
 
     try {
+      log.appendLine(`  - Generating the template...`);
       await child_process.exec(cmd, { cwd: options.factoryFolder });
     } catch (err) {
       vscode.window.showErrorMessage("Failed to generate the pack...", err);
@@ -35,7 +38,8 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
     }
   }
 
-  // update readme
+  log.appendLine(`  - Updating readme.md...`);
+
   let rd = fs.readFileSync(path.join(options.extensionPath, "out", "extension_readme.md"), "UTF-8");
   rd = rd
     .replace("#packageName#", options.packageName)
@@ -45,7 +49,8 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
     );
   fs.writeFileSync(path.join(extensionTemplatePath, "README.md"), rd);
 
-  // update package.json
+  log.appendLine(`  - Updating package.json...`);
+
   let pkJson = fs.readFileSync(path.join(options.extensionPath, "out", "extension_package.json"));
   fs.writeFileSync(path.join(extensionTemplatePath, "package.json"), pkJson);
 
@@ -63,6 +68,7 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
 
   fs.writeFileSync(path.join(extensionTemplatePath, "package.json"), JSON.stringify(packageJson), "UTF-8");
 
+  log.appendLine(`  - Preparing build folder...`);
   if (!prfs.existsSync(path.join(extensionTemplatePath, "build"))) {
     prfs.mkdirSync(path.join(extensionTemplatePath, "build"));
   }

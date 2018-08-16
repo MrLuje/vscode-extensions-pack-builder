@@ -31,7 +31,7 @@ export async function CreatePack(context: vscode.ExtensionContext) {
 
   log.appendLine(`* Creating a new pack !`);
   log.appendLine(` - Storage path: ${storagePath}`);
-  log.appendLine(` - Extension path: ${context.extensionPath}`);
+  log.appendLine(` - Extensions Pack builder path: ${context.extensionPath}`);
 
   let packNameRaw = await vscode.window.showInputBox({ placeHolder: "What is the name of your pack ?" });
   if (!packNameRaw) {
@@ -79,6 +79,8 @@ export async function CreatePack(context: vscode.ExtensionContext) {
     extensionPath: context.extensionPath
   };
 
+  log.appendLine(` - New extension path: ${path.join(options.factoryFolder, options.packageId)}`);
+
   ProcessPackCreation(context, options);
 }
 
@@ -89,7 +91,7 @@ function ProcessPackCreation(context: vscode.ExtensionContext, options: PackOpti
       if (token.isCancellationRequested) {
         return;
       }
-      log.appendLine(` Building extensions factory...`);
+      log.appendLine(` Preparing extensions factory...`);
       let success = await EnsureExtensionPackFactory(options);
       if (!success || token.isCancellationRequested) {
         return;
