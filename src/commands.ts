@@ -1,8 +1,7 @@
 import { InstallVSIX } from "./installExtension";
 import * as vscode from "vscode";
 import * as path from "path";
-import { AskMultiple, GetGitUserName } from "./helper";
-import * as sanitizefilename from "sanitize-filename";
+import { AskMultiple, GetGitUserName, GetUserFolder, SanitizePackageId } from "./helper";
 import { EnsureExtensionPackFactory, PackageExtension } from "./packFactory";
 import { log } from "./log";
 
@@ -23,7 +22,7 @@ export interface PackOptions {
 }
 
 export async function CreatePack(context: vscode.ExtensionContext) {
-  const storagePath = context.storagePath;
+  const storagePath = GetUserFolder();
   if (!storagePath) {
     vscode.window.showErrorMessage(`No storage path available to build extensions, please report an issue !`);
     return;
@@ -33,10 +32,20 @@ export async function CreatePack(context: vscode.ExtensionContext) {
   log.appendLine(` - Storage path: ${storagePath}`);
   log.appendLine(` - Extensions Pack builder path: ${context.extensionPath}`);
 
-  let packNameRaw = await vscode.window.showInputBox({ placeHolder: "What is the name of your pack ?" });
+  let packNameRaw = await vscode.window.showInputBox({
+    placeHolder: "What is the name of your pack ?"
+  });
   if (!packNameRaw) {
     return;
   }
+  // if (!packageNameRegex.test(packNameRaw)) {
+  //   let res = await vscode.window.showErrorMessage(`Invalid package name, only letters & numbers are allowed.`, { title: "Try again !" });
+  //   if (!res || res.title !== "Try again !") {
+  //     return;
+  //   }
+  //   await vscode.commands.executeCommand("packBuilder.createPack");
+  //   return;
+  // }
   let packName = packNameRaw;
 
   let selectedExtensions: Extension[] = [];
@@ -72,11 +81,11 @@ export async function CreatePack(context: vscode.ExtensionContext) {
   }
   publisher = publisher.trim();
   const options = {
-    packageId: sanitizefilename(packName),
+    packageId: SanitizePackageId(packName),
     packageName: packName,
     publisher: publisher,
     extensions: selectedExtensions,
-    factoryFolder: path.join(path.dirname(storagePath), EXTENSION_FOLDER),
+    factoryFolder: path.join(storagePath, EXTENSION_FOLDER),
     extensionPath: context.extensionPath
   };
 
@@ -87,7 +96,11 @@ export async function CreatePack(context: vscode.ExtensionContext) {
 
 function ProcessPackCreation(context: vscode.ExtensionContext, options: PackOptions) {
   vscode.window.withProgress(
-    { location: vscode.ProgressLocation.Notification, title: "Building extension pack..." },
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: "Building extension pack... (first run may take a few minutes)",
+      cancellable: true
+    },
     async (progress, token) => {
       if (token.isCancellationRequested) {
         return;

@@ -1,14 +1,34 @@
 import * as vscode from "vscode";
 import * as child_process from "child_process";
+import * as sanitizefilename from "sanitize-filename";
 
 export function IsInsiders() {
   return !!vscode.env.appName.match(/insiders/i);
+}
+
+export function SanitizePackageId(packageName: string) {
+  const packageIdFirstCharRegex = /[^a-z0-9-~]/g;
+  const packageIdRestRegex = /[^a-z0-9-._~]*/g;
+  let str = sanitizefilename(packageName).toLocaleLowerCase();
+  if (packageIdFirstCharRegex.test(str[0])) {
+    str = str[0].replace(packageIdFirstCharRegex, "") + str.substring(1);
+  }
+  if (packageIdRestRegex.test(str.substring(1))) {
+    str = str[0] + str.substring(1).replace(packageIdRestRegex, "");
+  }
+  return str;
 }
 
 export function Delay(timeoutMs: number = 1000) {
   return new Promise((ok, _) => {
     setTimeout(() => ok(), timeoutMs);
   });
+}
+
+export function GetUserFolder() {
+  return (
+    process.env.APPDATA || (process.platform === "darwin" ? process.env.HOME + "/Library/Preferences" : process.env.HOME + "/.local/share")
+  );
 }
 
 export function GetGitUserName(): Promise<string> {
