@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
-import * as prfs from "fs";
 import * as path from "path";
 import * as os from "os";
 import { child_process } from "./node_async/child_process";
@@ -11,17 +10,17 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
   const extensionDisplayName = options.packageName;
   const extensionTemplatePath = path.join(options.factoryFolder, options.packageId);
 
-  if (!prfs.existsSync(options.factoryFolder)) {
-    prfs.mkdirSync(options.factoryFolder);
+  if (!fs.existsSync(options.factoryFolder)) {
+    fs.mkdirSync(options.factoryFolder);
   }
 
   // install extension generator
-  if (!prfs.existsSync(path.join(options.factoryFolder, "node_modules"))) {
+  if (!fs.existsSync(path.join(options.factoryFolder, "node_modules"))) {
     log.appendLine(`  - Installing generators...`);
     await child_process.exec("npm i yo https://github.com/mrluje/vscode-generator-code.git#fix", { cwd: options.factoryFolder });
   }
 
-  if (!prfs.existsSync(path.join(extensionTemplatePath, "README.md"))) {
+  if (!fs.existsSync(path.join(extensionTemplatePath, "README.md"))) {
     // generate extension
     let cmd = `node_modules${path.sep}.bin${path.sep}yo code --extensionName="${
       options.packageId
@@ -54,25 +53,22 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
 
   log.appendLine(`  - Updating package.json...`);
 
-  let pkJson = fs.readFileSync(path.join(options.extensionPath, "out", "extension_package.json"));
-  fs.writeFileSync(path.join(extensionTemplatePath, "package.json"), pkJson);
-
-  let file = prfs.readFileSync(path.join(options.extensionPath, "out", "extension_package.json"), "UTF-8");
-  file = file
+  let pkJson = fs.readFileSync(path.join(options.extensionPath, "out", "extension_package.json"), "UTF-8");
+  pkJson = pkJson
     .replace("#extension-name#", options.packageId)
     .replace("#extension-displayname#", options.packageName)
     .replace("#extension-publisher#", options.publisher)
     .replace("#extension-list#", `${options.extensions.map(ext => `"${ext.id}"`).join(",")}`);
 
-  let packageJson = JSON.parse(file);
+  let packageJson = JSON.parse(pkJson);
   packageJson.repository = extensionTemplatePath;
   packageJson.icon = "pack_icon.png";
 
   fs.writeFileSync(path.join(extensionTemplatePath, "package.json"), JSON.stringify(packageJson), "UTF-8");
 
   log.appendLine(`  - Preparing build folder...`);
-  if (!prfs.existsSync(path.join(extensionTemplatePath, "build"))) {
-    prfs.mkdirSync(path.join(extensionTemplatePath, "build"));
+  if (!fs.existsSync(path.join(extensionTemplatePath, "build"))) {
+    fs.mkdirSync(path.join(extensionTemplatePath, "build"));
   }
 
   return true;
