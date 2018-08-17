@@ -55,7 +55,7 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
 
   let pkJson = fs.readFileSync(path.join(options.extensionPath, "out", "extension_package.json"), "UTF-8");
   pkJson = pkJson
-    .replace("#extension-name#", options.packageId)
+    .replace("#extension-name#", options.packageId.replace(".", ""))
     .replace("#extension-displayname#", options.packageName)
     .replace("#extension-publisher#", options.publisher)
     .replace("#extension-list#", `${options.extensions.map(ext => `"${ext.id}"`).join(",")}`);
