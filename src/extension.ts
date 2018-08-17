@@ -12,7 +12,7 @@ export function activate(context: vscode.ExtensionContext) {
   // This line of code will only be executed once when your extension is activated
   log.appendLine('Extension "vscode-extentions-pack-builder" is now active!');
 
-  let disposableCreatePack = vscode.commands.registerCommand("extension.createPack", async () => CreatePack(context));
+  let disposableCreatePack = vscode.commands.registerCommand("packBuilder.createPack", async () => CreatePack(context));
 
   context.subscriptions.push(disposableCreatePack);
 }

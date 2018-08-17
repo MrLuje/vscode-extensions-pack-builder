@@ -14,13 +14,13 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.createPack"
+        "onCommand:packBuilder.createPack"
     ],
     "main": "./out/extension",
     "contributes": {
         "commands": [
             {
-                "command": "extension.createPack",
+                "command": "packBuilder.createPack",
                 "title": "Extensions pack: Create pack"
             }
         ]
