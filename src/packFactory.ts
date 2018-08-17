@@ -38,6 +38,9 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
     }
   }
 
+  log.appendLine(`  - Copying icon...`);
+  fs.copyFileSync(path.join(options.extensionPath, "out", "pack_icon.png"), path.join(extensionTemplatePath, "pack_icon.png"));
+
   log.appendLine(`  - Updating readme.md...`);
 
   let rd = fs.readFileSync(path.join(options.extensionPath, "out", "extension_readme.md"), "UTF-8");
@@ -63,8 +66,7 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
 
   let packageJson = JSON.parse(file);
   packageJson.repository = extensionTemplatePath;
-  // TODO enable later
-  // packageJson.icon = path.join(context.extensionPath, "out", "pack_icon.png");
+  packageJson.icon = "pack_icon.png";
 
   fs.writeFileSync(path.join(extensionTemplatePath, "package.json"), JSON.stringify(packageJson), "UTF-8");
 
