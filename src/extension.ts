@@ -10,7 +10,7 @@ import { log } from "./log";
 export function activate(context: vscode.ExtensionContext) {
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
-  log.appendLine('Extension "vscode-extentions-pack-builder" is now active!');
+  log.appendLine('Extension "vscode-extensions-pack-builder" is now active!');
 
   let disposableCreatePack = vscode.commands.registerCommand("packBuilder.createPack", async () => CreatePack(context));
 

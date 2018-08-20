@@ -5,7 +5,7 @@ import { AskMultiple, GetGitUserName, GetUserFolder, SanitizePackageId } from ".
 import { EnsureExtensionPackFactory, PackageExtension } from "./packFactory";
 import { log } from "./log";
 
-const EXTENSION_FOLDER = "vscode-extentions-pack-builder";
+const EXTENSION_FOLDER = "vscode-extensions-pack-builder";
 
 export interface Extension {
   label: string;
