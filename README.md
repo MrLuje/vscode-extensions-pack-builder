@@ -28,6 +28,12 @@ Since July update, extension packs are way more powerful and enabling/disabling 
 
 - npm >= 5.2.0 (for npx support)
 
+## Extension commands
+
+This extension contributes the following commands:
+
+- `packBuilder.createPack`: initiate a pack creation
+
 ## How does this work ?
 
 Since there is no API to perform these operations, there is a bit a magic to make it work :
@@ -39,12 +45,12 @@ Since there is no API to perform these operations, there is a bit a magic to mak
 - Installing the extension though **code** executable (--install-extension flag)
 - Profit !
 
-## Known issue
+## Known issues
 
 Not really an issue but good to know, **Node Debug** (ms-vscode.node-debug2) extension is part os vscode and can't be disabled, so don't include it in any pack or you won't be able to disable it.
 
-## Extension commands
+## Build
 
-This extension contributes the following commands:
-
-- `packBuilder.createPack`: initiate a pack creation
+```bash
+npm run watch
+```
