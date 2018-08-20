@@ -7,6 +7,10 @@ export function IsInsiders() {
 }
 
 export function SanitizePackageId(packageName: string) {
+  if (packageName === "") {
+    return "";
+  }
+
   const packageIdFirstCharRegex = /[^a-z0-9-~]/g;
   const packageIdRestRegex = /[^a-z0-9-._~]*/g;
   let str = sanitizefilename(packageName).toLocaleLowerCase();

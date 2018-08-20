@@ -51,6 +51,8 @@
         "vscode": "^1.1.6"
     },
     "dependencies": {
-        "sanitize-filename": "^1.6.1"
+        "hoek": "^4.2.1",
+        "sanitize-filename": "^1.6.1",
+        "url-parse": "^1.4.3"
     }
 }
