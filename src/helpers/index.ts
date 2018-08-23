@@ -36,7 +36,7 @@ export function CheckUserFolder() {
     return { err: true, storagePath: null };
   }
 
-  return { ok: false, storagePath: storagePath };
+  return { err: false, storagePath: storagePath };
 }
 
 function getUserFolder() {
@@ -57,11 +57,9 @@ export function GetGitUserName(): Promise<string> {
   });
 }
 
-export async function AskMultiple(
-  question: string,
-  picks: vscode.QuickPickItem[],
-  save: (picks: vscode.QuickPickItem[]) => void
-): Promise<boolean> {
+export type FnSelectExtensions = (exts: vscode.QuickPickItem[]) => void;
+
+export async function AskMultiple(question: string, picks: vscode.QuickPickItem[], save: FnSelectExtensions): Promise<boolean> {
   const pick = await vscode.window.showQuickPick(picks, {
     placeHolder: question,
     ignoreFocusOut: true,
