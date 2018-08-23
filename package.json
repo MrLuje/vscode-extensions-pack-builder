@@ -14,7 +14,8 @@
         "Extension Packs"
     ],
     "activationEvents": [
-        "onCommand:packBuilder.createPack"
+        "onCommand:packBuilder.createPack",
+        "onCommand:packBuilder.editPack"
     ],
     "keywords": [
         "pack",
@@ -27,7 +28,13 @@
         "commands": [
             {
                 "command": "packBuilder.createPack",
-                "title": "Extensions pack: Create pack"
+                "title": "Create pack",
+                "category": "Extensions pack"
+            },
+            {
+                "command": "packBuilder.editPack",
+                "title": "Edit pack",
+                "category": "Extensions pack"
             }
         ]
     },

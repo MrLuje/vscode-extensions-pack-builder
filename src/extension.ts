@@ -2,7 +2,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
-import { CreatePack } from "./commands";
+import { CreatePack, EditPack } from "./commands";
 import { log } from "./log";
 
 // this method is called when your extension is activated
@@ -13,8 +13,9 @@ export function activate(context: vscode.ExtensionContext) {
   log.appendLine('Extension "vscode-extensions-pack-builder" is now active!');
 
   let disposableCreatePack = vscode.commands.registerCommand("packBuilder.createPack", async () => CreatePack(context));
+  let disposableEditPack = vscode.commands.registerCommand("packBuilder.editPack", async () => EditPack(context));
 
-  context.subscriptions.push(disposableCreatePack);
+  context.subscriptions.push(disposableCreatePack, disposableEditPack);
 }
 
 // this method is called when your extension is deactivated
