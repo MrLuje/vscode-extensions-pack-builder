@@ -29,7 +29,17 @@ export function Delay(timeoutMs: number = 1000) {
   });
 }
 
-export function GetUserFolder() {
+export function CheckUserFolder() {
+  const storagePath = getUserFolder();
+  if (!storagePath) {
+    vscode.window.showErrorMessage(`No storage path available to build extensions, please report an issue !`);
+    return { err: true, storagePath: null };
+  }
+
+  return { ok: false, storagePath: storagePath };
+}
+
+function getUserFolder() {
   return (
     process.env.APPDATA || (process.platform === "darwin" ? process.env.HOME + "/Library/Preferences" : process.env.HOME + "/.local/share")
   );

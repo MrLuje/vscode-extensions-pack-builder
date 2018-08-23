@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { IsInsiders, Delay } from "./helper";
+import { IsInsiders, Delay } from "./index";
 
 export async function InstallVSIX(file: vscode.Uri) {
   if (!file || !file.fsPath) {
