@@ -1,0 +1,10 @@
+{
+    "name": "p1",
+    "displayName": "P1",
+    "publisher": "myself",
+    "extensionPack": [
+        "p2",
+        "p3"
+    ],
+    "description": "test p1"
+}

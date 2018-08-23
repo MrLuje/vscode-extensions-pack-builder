@@ -3,3 +3,4 @@ out
 node_modules
 .vscode-test/
 *.vsix
+!/src/test/workspaces/**/node_modules
