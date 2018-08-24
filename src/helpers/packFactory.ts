@@ -2,9 +2,10 @@ import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import { child_process } from "./node_async/child_process";
-import { PackOptions } from "./commands";
+import { child_process } from "../node_async/child_process";
 import { log } from "./log";
+import { PackOptions } from "../models";
+import { InstallVSIX } from "./installExtension";
 
 export async function EnsureExtensionPackFactory(options: PackOptions) {
   const extensionDisplayName = options.packageName;
@@ -76,4 +77,46 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
 
 export function PackageExtension(extensionPath: string, extensionName: string) {
   return child_process.exec(`npx vsce package -o build/${extensionName}.vsix`, { cwd: extensionPath });
+}
+
+export function ProcessPackCreation(options: PackOptions) {
+  vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: "Building extension pack... (first run may take a few minutes)",
+      cancellable: true
+    },
+    async (progress, token) => {
+      if (token.isCancellationRequested) {
+        return;
+      }
+      log.appendLine(` Preparing extensions factory...`);
+      let success = await EnsureExtensionPackFactory(options);
+      if (!success || token.isCancellationRequested) {
+        return;
+      }
+
+      log.appendLine(` Creating the extension...`);
+      let packSuccess;
+      try {
+        packSuccess = await PackageExtension(path.join(options.factoryFolder, options.packageId), options.packageId);
+      } catch (err) {
+        vscode.window.showErrorMessage("Failed to generate the pack...\n" + err);
+      }
+      if (!packSuccess || token.isCancellationRequested) {
+        return;
+      }
+
+      // set it as done so the progress window is done
+      progress.report({ increment: 100 });
+      log.appendLine(` Installing the extension...`);
+
+      try {
+        await InstallVSIX(vscode.Uri.file(path.join(options.factoryFolder, options.packageId, "build", `${options.packageId}.vsix`)));
+      } catch (err) {
+        vscode.window.showErrorMessage("Failed to install the pack...\n" + err);
+      }
+      log.appendLine(` Done`);
+    }
+  );
 }

@@ -14,7 +14,8 @@
         "Extension Packs"
     ],
     "activationEvents": [
-        "onCommand:packBuilder.createPack"
+        "onCommand:packBuilder.createPack",
+        "onCommand:packBuilder.editPack"
     ],
     "keywords": [
         "pack",
@@ -27,7 +28,13 @@
         "commands": [
             {
                 "command": "packBuilder.createPack",
-                "title": "Extensions pack: Create pack"
+                "title": "Create pack",
+                "category": "Extensions pack"
+            },
+            {
+                "command": "packBuilder.editPack",
+                "title": "Edit pack",
+                "category": "Extensions pack"
             }
         ]
     },
@@ -37,6 +44,7 @@
         "watch": "npm run copy_files && tsc -watch -p ./",
         "copy_files": "copyfiles -f src/extension_readme.md src/extension_package.json images/pack_icon.png out",
         "postinstall": "node ./node_modules/vscode/bin/install",
+        "pretest": "npx copy-dir-cli ./src/test/workspaces ./out/test/workspaces",
         "test": "npm run compile && node ./node_modules/vscode/bin/test",
         "build": "vsce package -o ./build/vscode-extensions-pack-builder.vsix",
         "publish-market": "npm run build && vsce publish --packagePath ./build/vscode-extensions-pack-builder.vsix"
@@ -45,7 +53,9 @@
         "@types/mocha": "^2.2.42",
         "@types/node": "^8.9.4",
         "@types/sanitize-filename": "^1.1.28",
+        "@types/sinon": "^5.0.1",
         "copyfiles": "^2.0.0",
+        "sinon": "^6.1.5",
         "tslint": "^5.8.0",
         "typescript": "^2.6.1",
         "vscode": "^1.1.6"
