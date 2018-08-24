@@ -4,7 +4,7 @@ TL;DR: You can define groups of extensions that you can apply per project, eg :
 
 - a set of extension for .net development (intellisense, debugger, dependency management, etc)
 - use another one react
-- and disable non-relevant extensions !
+- and disable non-relevant extensions in one click !
 
 You only have pertinent extensions enabled for a given project without having to manage them one by one !
 
@@ -15,8 +15,12 @@ Since July update, extension packs are way more powerful and enabling/disabling 
 ## Features
 
 - Create new extensions packs
-- Select which extensions goes in it
-- Created pack is automatically installed
+  - Select which extensions goes in it
+  - Created pack is automatically installed
+  
+- Edit an existing extension pack
+  - Add/Remove extensions from it
+  - Get it installed in one click
 
 ![feature create pack](/images/demo.gif)
 
@@ -33,12 +37,13 @@ Since July update, extension packs are way more powerful and enabling/disabling 
 This extension contributes the following commands:
 
 - `packBuilder.createPack`: initiate a pack creation
+- `packBuilder.editPack`: initiate a pack edition
 
 ## How does this work ?
 
 Since there is no API to perform these operations, there is a bit a magic to make it work :
 
-- Installing _yo_ and _generator-code_ with npm
+- Installing locally _yo_ and _generator-code_ with npm
 - Running _yo_ to create the project
 - Editing a few files in this project to apply your choices
 - Packaging the project
@@ -47,7 +52,7 @@ Since there is no API to perform these operations, there is a bit a magic to mak
 
 ## Known issues
 
-Not really an issue but good to know, **Node Debug** (ms-vscode.node-debug2) extension is part os vscode and can't be disabled, so don't include it in any pack or you won't be able to disable it.
+Not really an issue but good to know, **Node Debug** (ms-vscode.node-debug2) extension is part of vscode and can't be disabled, so don't include it in any pack or you won't be able to disable it.
 
 ## Build
 
