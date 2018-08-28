@@ -5,6 +5,7 @@ import { Extension } from "../models";
 import { log } from "../helpers/log";
 import { ProcessPackCreation } from "../helpers/packFactory";
 import { CheckUserFolder, AskMultiple, GetGitUserName, SanitizePackageId } from "../helpers";
+import { getInstalledExtensions } from "../helpers/extensionList";
 
 export async function CreatePack(context: vscode.ExtensionContext) {
   const { err, storagePath } = CheckUserFolder();
@@ -12,13 +13,17 @@ export async function CreatePack(context: vscode.ExtensionContext) {
     return;
   }
 
+  let extensions$ = getInstalledExtensions();
+
   log.appendLine(`* Creating a new pack !`);
   log.appendLine(` - Storage path: ${storagePath}`);
   log.appendLine(` - Extensions Pack builder path: ${context.extensionPath}`);
 
-  let packNameRaw = await vscode.window.showInputBox({
+  let packName$ = vscode.window.showInputBox({
     placeHolder: "What is the name of your pack ?"
   });
+
+  let [packNameRaw, extensions] = await Promise.all([packName$, extensions$]);
   if (!packNameRaw) {
     return;
   }
@@ -36,12 +41,11 @@ export async function CreatePack(context: vscode.ExtensionContext) {
 
   await AskMultiple(
     "Select the extensions you want to pack :",
-    vscode.extensions.all
-      .filter(ext => ext.extensionPath.includes(".vscode"))
+    extensions
       .map(ext => {
         return {
           id: ext.id,
-          label: ext.packageJSON.displayName || ext.packageJSON.name
+          label: (ext as any).displayName
         };
       })
       .sort((a: { label: string }, b: { label: string }) => a.label.localeCompare(b.label)),
