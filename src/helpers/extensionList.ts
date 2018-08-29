@@ -1,38 +1,43 @@
 import * as vscode from "vscode";
-import * as fs from "fs";
 import { dirname, join } from "path";
 import { prfs } from "../node_async/fs";
+import { log } from "./log";
+
+const isValidExt = (ext: vscode.Extension<any> | undefined): ext is vscode.Extension<any> => !!ext;
+const dirToJsonPath = (extensionsDir: string, extensionName: string) => join(extensionsDir, extensionName, "package.json");
+const readParseJson = async (fullpath: string) => JSON.parse(await prfs.readFile(fullpath, { encoding: "UTF-8" }));
+const filterInstalledExtension = (ext: vscode.Extension<any>) => ext.extensionPath.includes(".vscode");
 
 export async function getInstalledExtensions(): Promise<vscode.Extension<any>[]> {
-  const parseJson = (fullpath: string) => JSON.parse(fs.readFileSync(fullpath, { encoding: "UTF-8" }));
-
   const installedExtensions = vscode.extensions.all.filter(filterInstalledExtension);
   if (installedExtensions.length > 0) {
     const extensionsDir = dirname(installedExtensions[0].extensionPath);
     const extensionsDirs = await prfs.readdir(extensionsDir);
 
-    return extensionsDirs
-      .map(ext => join(extensionsDir, ext, "package.json"))
-      .filter(f => fs.existsSync(f))
-      .map(f => {
-        return { dir: dirname(f), pkJon: parseJson(f) };
-      })
-      .map(ext => {
-        return {
-          id: ext.pkJon.name,
-          displayName: ext.pkJon.displayName || ext.pkJon.name,
-          extensionPath: ext.dir,
+    const arr = extensionsDirs.map(async dir => {
+      const jsonPath = dirToJsonPath(extensionsDir, dir);
+
+      try {
+        const jsonObj = await readParseJson(jsonPath);
+
+        return <vscode.Extension<any>>{
+          id: jsonObj.name,
+          displayName: jsonObj.displayName || jsonObj.name,
+          extensionPath: dir,
           isActive: true,
-          packageJSON: JSON.stringify(ext),
+          packageJSON: JSON.stringify(jsonObj),
           exports: null,
           activate: () => Promise.resolve()
         };
-      });
+      } catch (ex) {
+        log.appendLine(` * Failed to read ${jsonPath}`);
+        return undefined;
+      }
+    });
+
+    let exts = await Promise.all(arr);
+    return exts.filter(isValidExt);
   }
 
   return vscode.extensions.all;
-}
-
-function filterInstalledExtension(ext: vscode.Extension<any>) {
-  return ext.extensionPath.includes(".vscode");
 }
