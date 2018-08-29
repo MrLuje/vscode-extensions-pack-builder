@@ -1,4 +1,6 @@
 # VS Code Extensions Pack builder
+[![Build status](https://ci.appveyor.com/api/projects/status/036oherurxjb60iq/branch/master?svg=true)](https://ci.appveyor.com/project/MrLuje/vscode-extensions-pack-builder/branch/master)
+[![Build Status](https://travis-ci.com/MrLuje/vscode-extensions-pack-builder.svg?branch=master)](https://travis-ci.com/MrLuje/vscode-extensions-pack-builder)
 
 TL;DR: You can define groups of extensions that you can apply per project, eg :
 
