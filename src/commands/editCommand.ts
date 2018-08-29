@@ -6,6 +6,14 @@ import { Extension } from "../models";
 import { log } from "../helpers/log";
 import { ProcessPackCreation } from "../helpers/packFactory";
 import { CheckUserFolder, AskMultiple } from "../helpers";
+import { getInstalledExtensions } from "../helpers/extensionList";
+
+type ExtensionPack = {
+  label: string;
+  name: string;
+  extensions: string[];
+  publisher: string;
+};
 
 export async function EditPack(context: vscode.ExtensionContext) {
   const { err, storagePath } = CheckUserFolder();
@@ -29,6 +37,7 @@ export async function EditPack(context: vscode.ExtensionContext) {
   };
 
   const parseJson = (fullpath: string) => JSON.parse(fs.readFileSync(fullpath, { encoding: "UTF-8" }));
+  const installedExtensions$ = getInstalledExtensions();
 
   const packageJsons = fs
     .readdirSync(factoryFolder)
@@ -42,35 +51,30 @@ export async function EditPack(context: vscode.ExtensionContext) {
     .reduce((prev: string[], curr) => prev.concat(curr), [])
     .map(parseJson);
 
-  const selectedExtension = await vscode.window.showQuickPick(
-    packageJsons.map(pj => {
-      return {
-        label: pj.displayName as string,
-        name: pj.name as string,
-        extensions: pj.extensionPack as string[],
-        publisher: pj.publisher as string
-      };
-    })
-  );
+  const existingPacks = packageJsons.map(pj => {
+    return <ExtensionPack>{
+      label: pj.displayName,
+      name: pj.name,
+      extensions: pj.extensionPack,
+      publisher: pj.publisher
+    };
+  });
 
-  if (!selectedExtension) {
+  const validatePack = (pack: ExtensionPack | undefined): pack is ExtensionPack => !!pack;
+  const [selectedPack, installedExtensions] = await Promise.all([vscode.window.showQuickPick(existingPacks), installedExtensions$]);
+  if (!validatePack(selectedPack)) {
     return;
   }
 
-  let allExtensions = vscode.extensions.all
-    .filter(ext => ext.extensionPath.includes(".vscode"))
+  let allExtensions = installedExtensions
     .map(ext => {
-      return {
-        id: ext.id,
-        label: ext.packageJSON.displayName || ext.packageJSON.name,
-        picked: false
-      };
+      return { id: ext.id, label: (ext as any).displayName, picked: false };
     })
     .sort((a: { label: string }, b: { label: string }) => a.label.localeCompare(b.label));
 
   // preselect extensions from the pack
   allExtensions = allExtensions.map(e => {
-    e.picked = selectedExtension.extensions.indexOf(e.id) > -1;
+    e.picked = selectedPack.extensions.indexOf(e.id) > -1;
     return e;
   });
 
@@ -83,9 +87,9 @@ export async function EditPack(context: vscode.ExtensionContext) {
   }
 
   const options = {
-    packageId: selectedExtension.name,
-    packageName: selectedExtension.label,
-    publisher: selectedExtension.publisher,
+    packageId: selectedPack.name,
+    packageName: selectedPack.label,
+    publisher: selectedPack.publisher,
     extensions: selectedExtensions,
     factoryFolder: path.join(storagePath, EXTENSION_FOLDER),
     extensionPath: context.extensionPath
