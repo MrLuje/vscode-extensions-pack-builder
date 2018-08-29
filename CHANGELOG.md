@@ -2,8 +2,14 @@
 
 All notable changes to the "vscode-extensions-pack-builder" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [0.1.1]
 
-## [Unreleased]
+- Use another source for extensions than vscode.extensions.all (which only contains enabled extensions)
+
+## [0.1.0]
+
+- Add packBuilder.editPack command
+
+## [0.0.1]
 
 - Initial release
