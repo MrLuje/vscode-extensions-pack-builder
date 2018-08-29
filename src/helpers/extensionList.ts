@@ -21,7 +21,7 @@ export async function getInstalledExtensions(): Promise<vscode.Extension<any>[]>
         const jsonObj = await readParseJson(jsonPath);
 
         return <vscode.Extension<any>>{
-          id: jsonObj.name,
+          id: `${jsonObj.publisher}.${jsonObj.name}`,
           displayName: jsonObj.displayName || jsonObj.name,
           extensionPath: dir,
           isActive: true,
