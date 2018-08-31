@@ -13,7 +13,7 @@ export async function CreatePack(context: vscode.ExtensionContext) {
     return;
   }
 
-  let extensions$ = getInstalledExtensions();
+  let extensions$ = getInstalledExtensions(context);
 
   log.appendLine(`* Creating a new pack !`);
   log.appendLine(` - Storage path: ${storagePath}`);
@@ -27,6 +27,7 @@ export async function CreatePack(context: vscode.ExtensionContext) {
   if (!packNameRaw) {
     return;
   }
+
   // if (!packageNameRegex.test(packNameRaw)) {
   //   let res = await vscode.window.showErrorMessage(`Invalid package name, only letters & numbers are allowed.`, { title: "Try again !" });
   //   if (!res || res.title !== "Try again !") {
@@ -36,7 +37,6 @@ export async function CreatePack(context: vscode.ExtensionContext) {
   //   return;
   // }
   let packName = packNameRaw;
-
   let selectedExtensions: Extension[] = [];
 
   await AskMultiple(
