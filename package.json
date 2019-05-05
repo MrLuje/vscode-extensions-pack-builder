@@ -50,6 +50,7 @@
         "publish-market": "npm run build && vsce publish --packagePath ./build/vscode-extensions-pack-builder.vsix"
     },
     "devDependencies": {
+        "@types/dashify": "^1.0.0",
         "@types/mocha": "^2.2.42",
         "@types/node": "^8.9.4",
         "@types/sanitize-filename": "^1.1.28",
@@ -61,6 +62,7 @@
         "vscode": "^1.1.6"
     },
     "dependencies": {
+        "dashify": "^2.0.0",
         "hoek": "^4.2.1",
         "sanitize-filename": "^1.6.1",
         "url-parse": "^1.4.3"
