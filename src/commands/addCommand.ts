@@ -4,7 +4,7 @@ import { EXTENSION_FOLDER } from "../const";
 import { Extension } from "../models";
 import { log } from "../helpers/log";
 import { ProcessPackCreation } from "../helpers/packFactory";
-import { CheckUserFolder, AskMultiple, GetGitUserName, SanitizePackageId } from "../helpers";
+import { CheckUserFolder, AskMultiple, GetGitUserName, SanitizePackageId, SanitizePublisherId } from "../helpers";
 import { getInstalledExtensions } from "../helpers/extensionList";
 
 export async function CreatePack(context: vscode.ExtensionContext) {
@@ -67,7 +67,7 @@ export async function CreatePack(context: vscode.ExtensionContext) {
     }
     publisher = pub;
   }
-  publisher = publisher.trim();
+  publisher = SanitizePublisherId(publisher);
   const options = {
     packageId: SanitizePackageId(packName),
     packageName: packName,

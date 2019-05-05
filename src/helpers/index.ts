@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import * as child_process from "child_process";
 import * as sanitizefilename from "sanitize-filename";
+import * as dashify from "dashify";
 
 export function IsInsiders() {
   return !!vscode.env.appName.match(/insiders/i);
@@ -21,6 +22,10 @@ export function SanitizePackageId(packageName: string) {
     str = str[0] + str.substring(1).replace(packageIdRestRegex, "");
   }
   return str;
+}
+
+export function SanitizePublisherId(username: string){
+  return dashify(username.trim());
 }
 
 export function Delay(timeoutMs: number = 1000) {
