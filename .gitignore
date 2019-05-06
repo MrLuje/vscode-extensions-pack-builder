@@ -1,6 +1,8 @@
 build/
 out
 node_modules
+coverage/
 .vscode-test/
+.nyc_output/
 *.vsix
 !/src/test/workspaces/**/node_modules
