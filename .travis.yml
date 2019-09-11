@@ -21,3 +21,4 @@ install:
 
 script:
   - npm run test
+  - cat /home/travis/.npm/_logs/*.log
