@@ -1,11 +1,12 @@
 import * as assert from "assert";
 import * as sinon from "sinon";
-import * as packfactory from "../helpers/packFactory";
-import * as extensionList from "../helpers/extensionList";
-import * as helpers from "../helpers";
+import * as packfactory from "../../helpers/packFactory";
+import * as extensionList from "../../helpers/extensionList";
+import * as helpers from "../../helpers";
 import * as vscode from "vscode";
 import { join } from "path";
-import { preSelectAndFormatExtensionList, ExtensionPack } from "../commands/editCommand";
+import { preSelectAndFormatExtensionList, ExtensionPack } from "../../commands/editCommand";
+import { getExtensions } from "../../helpers/extensionProvider";
 
 suite("EditCommand ProcessPackCreation", function() {
   var processPackCreationStub: sinon.SinonStub;
@@ -13,6 +14,7 @@ suite("EditCommand ProcessPackCreation", function() {
   var askMultipleStub: sinon.SinonStub;
   var inputBoxStub: sinon.SinonStub;
   var getGitUserNameStub: sinon.SinonStub;
+  var checkUserFolderStub: sinon.SinonStub;
   const expectedPackageName = "packname";
   const expectedGitUserName = "name";
 
@@ -22,8 +24,10 @@ suite("EditCommand ProcessPackCreation", function() {
     processPackCreationStub = sinon.stub(packfactory, "ProcessPackCreation");
     quickPickStub = sinon.stub(vscode.window, "showQuickPick");
     askMultipleStub = sinon.stub(helpers, "AskMultiple");
-    sinon.stub(helpers, "CheckUserFolder").callsFake(() => {
-      return { err: false, storagePath: join(__dirname, "workspaces", "expected") };
+
+    checkUserFolderStub = sinon.stub(helpers, "CheckUserFolder");
+    checkUserFolderStub.callsFake(() => {
+      return { err: false, storagePath: join(__dirname, "..", "workspaces", "expected") };
     });
 
     inputBoxStub = sinon.stub(vscode.window, "showInputBox");
@@ -63,26 +67,32 @@ suite("preSelectAndFormatExtensionList", function() {
 
   test("Should returns at least all extensions given", function() {
     const selectedPack = { name: "", label: "", extensions: [], publisher: "" };
-    const installedExtensions = vscode.extensions.all.filter(e => e.extensionPath.includes(".vscode")).map(e => {
-      return { ...e, displayName: e.id };
-    });
+    const installedExtensions = getExtensions()
+      .filter(e => e.extensionPath.includes(".vscode"))
+      .map(e => {
+        return { ...e, displayName: e.id };
+      });
     const extensionsReadyForPick = preSelectAndFormatExtensionList(<vscode.ExtensionContext>{}, installedExtensions, selectedPack);
     assert.equal(installedExtensions.length, extensionsReadyForPick.length);
   });
 
   test("Should returns all extensions unpicked if no selectedPack", function() {
-    const installedExtensions = vscode.extensions.all.filter(e => e.extensionPath.includes(".vscode")).map(e => {
-      return { ...e, displayName: e.id };
-    });
+    const installedExtensions = getExtensions()
+      .filter(e => e.extensionPath.includes(".vscode"))
+      .map(e => {
+        return { ...e, displayName: e.id };
+      });
     const selectedPack: ExtensionPack = { name: "", label: "", extensions: [], publisher: "" };
     const extensionsReadyForPick = preSelectAndFormatExtensionList(<vscode.ExtensionContext>{}, installedExtensions, selectedPack);
     assert.equal(extensionsReadyForPick.filter(e => e.picked).length, 0);
   });
 
   test("Should returns pick extensions from selectedPack", function() {
-    const installedExtensions = vscode.extensions.all.filter(e => e.extensionPath.includes(".vscode")).map(e => {
-      return { ...e, displayName: e.id };
-    });
+    const installedExtensions = getExtensions()
+      .filter(e => e.extensionPath.includes(".vscode"))
+      .map(e => {
+        return { ...e, displayName: e.id };
+      });
     const selectedPack: ExtensionPack = { name: "", label: "", extensions: [installedExtensions[0].id], publisher: "" };
     const extensionsReadyForPick = preSelectAndFormatExtensionList(<vscode.ExtensionContext>{}, installedExtensions, selectedPack);
     assert.equal(extensionsReadyForPick.filter(e => e.picked).length, 1);
@@ -91,9 +101,11 @@ suite("preSelectAndFormatExtensionList", function() {
 
   test("Should add label from unknown extensions using getKnownExtensions", function() {
     getKnownExtensionsStub.returns([{ id: "vscode-poney", displayName: "Who doesn't love poney..." }]);
-    const installedExtensions = vscode.extensions.all.filter(e => e.extensionPath.includes(".vscode")).map(e => {
-      return { ...e, displayName: e.id };
-    });
+    const installedExtensions = getExtensions()
+      .filter(e => e.extensionPath.includes(".vscode"))
+      .map(e => {
+        return { ...e, displayName: e.id };
+      });
     const selectedPack: ExtensionPack = {
       name: "",
       label: "",
@@ -108,9 +120,11 @@ suite("preSelectAndFormatExtensionList", function() {
 
   test("Should not do anything for unmatched extensions", function() {
     getKnownExtensionsStub.returns([{ id: "vscode-poney", displayName: "Who doesn't love poney..." }]);
-    const installedExtensions = vscode.extensions.all.filter(e => e.extensionPath.includes(".vscode")).map(e => {
-      return { ...e, displayName: e.id };
-    });
+    const installedExtensions = getExtensions()
+      .filter(e => e.extensionPath.includes(".vscode"))
+      .map(e => {
+        return { ...e, displayName: e.id };
+      });
     const selectedPack: ExtensionPack = { name: "", label: "", extensions: [], publisher: "" };
 
     const extensionsReadyForPick = preSelectAndFormatExtensionList(<vscode.ExtensionContext>{}, installedExtensions, selectedPack);
