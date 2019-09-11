@@ -43,7 +43,7 @@
         "compile": "tsc -p ./",
         "watch": "npm run copy_files && tsc -watch -p ./",
         "copy_files": "copyfiles -f src/extension_readme.md src/extension_package.json images/pack_icon.png out",
-        "pretest": "npx copy-dir-cli ./src/test/workspaces ./out/test/workspaces",
+        "pretest": "npx cpx \"./src/test/workspaces/**/*.*\" ./out/test/workspaces",
         "test": "npm run compile && node ./out/test/runTest.js",
         "build": "vsce package -o ./build/vscode-extensions-pack-builder.vsix",
         "publish-market": "npm run build && vsce publish --packagePath ./build/vscode-extensions-pack-builder.vsix"

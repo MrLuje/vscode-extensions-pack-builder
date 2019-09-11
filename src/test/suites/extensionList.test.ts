@@ -30,7 +30,7 @@ suite("extensionList", function() {
       publisher: publisher,
       name: name,
       displayName: displayName,
-      activate: () => {},
+      activate: () => Promise.resolve({}),
       exports: undefined,
       extensionKind: vscode.ExtensionKind.UI,
       isActive: true,
@@ -44,7 +44,7 @@ suite("extensionList", function() {
     const extension1 = getFakeExtention("1", "internal", ".vscode/here");
     const extension2 = getFakeExtention("2", "not-internal", "here");
 
-    stubs.push(sinon.stub(extensionProvider, "getExtensions").returns(<extensionList.vsCodeExtension[]>[extension1, extension2]));
+    stubs.push(sinon.stub(extensionProvider, "getExtensions").returns(<vscode.Extension<any>[]>[extension1, extension2]));
 
     stubs.push(sinon.stub(prfs, "readdir").returns(Promise.resolve(["some folder"])));
     const readFileStub = sinon.stub(prfs, "readFile");
@@ -60,7 +60,7 @@ suite("extensionList", function() {
   test("DisplayName should use displayName and fallback to name", async function() {
     const expectedDisplayName = "display-internal";
     const extension1 = getFakeExtention("1", "internal", ".vscode/here", expectedDisplayName);
-    stubs.push(sinon.stub(extensionProvider, "getExtensions").returns(<extensionList.vsCodeExtension[]>[extension1]));
+    stubs.push(sinon.stub(extensionProvider, "getExtensions").returns(<vscode.Extension<any>[]>[extension1]));
 
     stubs.push(sinon.stub(prfs, "readdir").returns(Promise.resolve(["some folder"])));
 
@@ -75,7 +75,7 @@ suite("extensionList", function() {
   test("Shouldn't use DisplayName if contains % and fallback to name", async function() {
     const displayName = "%display-name%";
     const extension1 = getFakeExtention("1", "internal", ".vscode/here", displayName);
-    stubs.push(sinon.stub(extensionProvider, "getExtensions").returns(<extensionList.vsCodeExtension[]>[extension1]));
+    stubs.push(sinon.stub(extensionProvider, "getExtensions").returns(<vscode.Extension<any>[]>[extension1]));
 
     stubs.push(sinon.stub(prfs, "readdir").returns(Promise.resolve(["some folder"])));
 

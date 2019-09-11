@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import * as child_process from "child_process";
-import * as sanitizefilename from "sanitize-filename";
 import * as dashify from "dashify";
+let sanitizefilename = require("sanitize-filename");
 
 export function IsInsiders() {
   return !!vscode.env.appName.match(/insiders/i);
