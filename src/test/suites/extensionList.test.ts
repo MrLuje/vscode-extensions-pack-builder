@@ -4,7 +4,6 @@ import * as extensionList from "../../helpers/extensionList";
 import * as extensionProvider from "../../helpers/extensionProvider";
 import * as sinon from "sinon";
 import { prfs } from "../../node_async/fs";
-import { Dirent } from "fs";
 
 suite("extensionList", function() {
   let vsCodeContext: sinon.SinonSpy;
@@ -40,10 +39,6 @@ suite("extensionList", function() {
     };
   };
 
-  const toDirent = (s: string) => {
-    return <Dirent>Object.assign(new Dirent(), "name", s);
-  };
-
   test("Should contains only non-internal vscode.extensions.all", async function() {
     // arrange
     const extension1 = getFakeExtention("1", "internal", ".vscode/here");
@@ -51,7 +46,7 @@ suite("extensionList", function() {
 
     stubs.push(sinon.stub(extensionProvider, "getExtensions").returns(<vscode.Extension<any>[]>[extension1, extension2]));
 
-    stubs.push(sinon.stub(prfs, "readdir").returns(Promise.resolve([toDirent("some folder")])));
+    stubs.push(sinon.stub(prfs, "readdir").returns(Promise.resolve(["some folder"])));
     const readFileStub = sinon.stub(prfs, "readFile");
     stubs.push(readFileStub);
     readFileStub.onFirstCall().returns(Promise.resolve(JSON.stringify(extension1)));
@@ -67,7 +62,7 @@ suite("extensionList", function() {
     const extension1 = getFakeExtention("1", "internal", ".vscode/here", expectedDisplayName);
     stubs.push(sinon.stub(extensionProvider, "getExtensions").returns(<vscode.Extension<any>[]>[extension1]));
 
-    stubs.push(sinon.stub(prfs, "readdir").returns(Promise.resolve([toDirent("some folder")])));
+    stubs.push(sinon.stub(prfs, "readdir").returns(Promise.resolve(["some folder"])));
 
     const readFileStub = sinon.stub(prfs, "readFile");
     stubs.push(readFileStub);
@@ -82,7 +77,7 @@ suite("extensionList", function() {
     const extension1 = getFakeExtention("1", "internal", ".vscode/here", displayName);
     stubs.push(sinon.stub(extensionProvider, "getExtensions").returns(<vscode.Extension<any>[]>[extension1]));
 
-    stubs.push(sinon.stub(prfs, "readdir").returns(Promise.resolve([toDirent("some folder")])));
+    stubs.push(sinon.stub(prfs, "readdir").returns(Promise.resolve(["some folder"])));
 
     const readFileStub = sinon.stub(prfs, "readFile");
     stubs.push(readFileStub);
