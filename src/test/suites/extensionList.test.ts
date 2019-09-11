@@ -4,6 +4,7 @@ import * as extensionList from "../../helpers/extensionList";
 import * as extensionProvider from "../../helpers/extensionProvider";
 import * as sinon from "sinon";
 import { prfs } from "../../node_async/fs";
+import { Dirent } from "fs";
 
 suite("extensionList", function() {
   let vsCodeContext: sinon.SinonSpy;
@@ -30,7 +31,7 @@ suite("extensionList", function() {
       publisher: publisher,
       name: name,
       displayName: displayName,
-      activate: () => {},
+      activate: () => Promise.resolve({}),
       exports: undefined,
       extensionKind: vscode.ExtensionKind.UI,
       isActive: true,
@@ -39,14 +40,18 @@ suite("extensionList", function() {
     };
   };
 
+  const toDirent = (s: string) => {
+    return <Dirent>Object.assign(new Dirent(), "name", s);
+  };
+
   test("Should contains only non-internal vscode.extensions.all", async function() {
     // arrange
     const extension1 = getFakeExtention("1", "internal", ".vscode/here");
     const extension2 = getFakeExtention("2", "not-internal", "here");
 
-    stubs.push(sinon.stub(extensionProvider, "getExtensions").returns(<extensionList.vsCodeExtension[]>[extension1, extension2]));
+    stubs.push(sinon.stub(extensionProvider, "getExtensions").returns(<vscode.Extension<any>[]>[extension1, extension2]));
 
-    stubs.push(sinon.stub(prfs, "readdir").returns(Promise.resolve(["some folder"])));
+    stubs.push(sinon.stub(prfs, "readdir").returns(Promise.resolve([toDirent("some folder")])));
     const readFileStub = sinon.stub(prfs, "readFile");
     stubs.push(readFileStub);
     readFileStub.onFirstCall().returns(Promise.resolve(JSON.stringify(extension1)));
@@ -60,9 +65,9 @@ suite("extensionList", function() {
   test("DisplayName should use displayName and fallback to name", async function() {
     const expectedDisplayName = "display-internal";
     const extension1 = getFakeExtention("1", "internal", ".vscode/here", expectedDisplayName);
-    stubs.push(sinon.stub(extensionProvider, "getExtensions").returns(<extensionList.vsCodeExtension[]>[extension1]));
+    stubs.push(sinon.stub(extensionProvider, "getExtensions").returns(<vscode.Extension<any>[]>[extension1]));
 
-    stubs.push(sinon.stub(prfs, "readdir").returns(Promise.resolve(["some folder"])));
+    stubs.push(sinon.stub(prfs, "readdir").returns(Promise.resolve([toDirent("some folder")])));
 
     const readFileStub = sinon.stub(prfs, "readFile");
     stubs.push(readFileStub);
@@ -75,9 +80,9 @@ suite("extensionList", function() {
   test("Shouldn't use DisplayName if contains % and fallback to name", async function() {
     const displayName = "%display-name%";
     const extension1 = getFakeExtention("1", "internal", ".vscode/here", displayName);
-    stubs.push(sinon.stub(extensionProvider, "getExtensions").returns(<extensionList.vsCodeExtension[]>[extension1]));
+    stubs.push(sinon.stub(extensionProvider, "getExtensions").returns(<vscode.Extension<any>[]>[extension1]));
 
-    stubs.push(sinon.stub(prfs, "readdir").returns(Promise.resolve(["some folder"])));
+    stubs.push(sinon.stub(prfs, "readdir").returns(Promise.resolve([toDirent("some folder")])));
 
     const readFileStub = sinon.stub(prfs, "readFile");
     stubs.push(readFileStub);
