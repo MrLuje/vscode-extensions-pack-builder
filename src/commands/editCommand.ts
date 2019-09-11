@@ -17,7 +17,7 @@ export type ExtensionPack = {
 
 export function preSelectAndFormatExtensionList(
   context: vscode.ExtensionContext,
-  installedExtensions: vscode.Extension<any>[],
+  installedExtensions: { id: string; displayName: string }[],
   selectedPack: ExtensionPack
 ) {
   let allExtensions = installedExtensions.map(ext => {
@@ -33,9 +33,9 @@ export function preSelectAndFormatExtensionList(
       allExtensions[extensionIndex].picked = true;
     } else {
       // the extension from the selected pack is not part of installed extension currently on vscode, try to find it
-      const eeee = knownExtensions.find(e => e.id === extensionId);
-      if (eeee) {
-        allExtensions.push({ id: extensionId, label: eeee.displayName, picked: true });
+      const previouslyKnownExtension = knownExtensions.find(e => e.id === extensionId);
+      if (previouslyKnownExtension) {
+        allExtensions.push({ id: extensionId, label: previouslyKnownExtension.displayName, picked: true });
       }
     }
   });

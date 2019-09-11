@@ -3,14 +3,22 @@ import { dirname, join } from "path";
 import { prfs } from "../node_async/fs";
 import { log } from "./log";
 import { EXTENSION_NAME } from "../const";
+import { getExtensions } from "./extensionProvider";
 
-const isValidExt = (ext: vscode.Extension<any> | undefined): ext is vscode.Extension<any> => !!ext;
+const isValidExt = (ext: vsCodeExtension | undefined): ext is vsCodeExtension => !!ext;
 const dirToJsonPath = (extensionsDir: string, extensionName: string) => join(extensionsDir, extensionName, "package.json");
-const readParseJson = async (fullpath: string) => JSON.parse(await prfs.readFile(fullpath, { encoding: "UTF-8" }));
+const readParseJson = async (fullpath: string) => {
+  let res = prfs.readFile(fullpath, { encoding: "UTF-8" });
+  return JSON.parse(await res);
+};
 const filterInstalledExtension = (ext: vscode.Extension<any>) => ext.extensionPath.includes(".vscode");
+const getDisplayName = (jsonObj: { name: string; displayName: string }) =>
+  (jsonObj.displayName.endsWith("%") ? undefined : jsonObj.displayName) || jsonObj.name;
 
-async function _getInstalledExtensions(): Promise<vscode.Extension<any>[]> {
-  const installedExtensions = vscode.extensions.all.filter(filterInstalledExtension);
+export type vsCodeExtension = Omit<vscode.Extension<any>, "extensionKind" | "activate" | "export"> & { displayName: string | undefined };
+
+async function _getInstalledExtensions(): Promise<vsCodeExtension[]> {
+  const installedExtensions = getExtensions().filter(filterInstalledExtension);
   if (installedExtensions.length > 0) {
     const extensionsDir = dirname(installedExtensions[0].extensionPath);
     const extensionsDirs = await prfs.readdir(extensionsDir);
@@ -21,14 +29,12 @@ async function _getInstalledExtensions(): Promise<vscode.Extension<any>[]> {
       try {
         const jsonObj = await readParseJson(jsonPath);
 
-        return <vscode.Extension<any>>{
+        return <vsCodeExtension>{
           id: `${jsonObj.publisher}.${jsonObj.name}`,
-          displayName: jsonObj.displayName || jsonObj.name,
+          displayName: getDisplayName(jsonObj),
           extensionPath: dir,
           isActive: true,
-          packageJSON: JSON.stringify(jsonObj),
-          exports: null,
-          activate: () => Promise.resolve()
+          packageJSON: JSON.stringify(jsonObj)
         };
       } catch (ex) {
         log.appendLine(` * Failed to read ${jsonPath}`);
@@ -40,13 +46,15 @@ async function _getInstalledExtensions(): Promise<vscode.Extension<any>[]> {
     return exts.filter(isValidExt);
   }
 
-  return vscode.extensions.all;
+  return getExtensions().map(e => {
+    return { ...e, displayName: undefined };
+  });
 }
 
 const isUnique = (e: { id: string; displayName: string }, index: number, self: { id: string; displayName: string }[]) =>
   self.findIndex(ee => ee.id === e.id) === index;
 
-function saveExtensionIdName(context: vscode.ExtensionContext, extensions: vscode.Extension<any>[]): void {
+function saveExtensionIdName(context: vscode.ExtensionContext, extensions: vsCodeExtension[]): void {
   let knownExtensions = getKnownExtensions(context);
   let t = extensions
     .map(e => {
@@ -54,6 +62,7 @@ function saveExtensionIdName(context: vscode.ExtensionContext, extensions: vscod
     })
     .concat(knownExtensions)
     .filter(isUnique);
+
   context.globalState.update(`${EXTENSION_NAME}-knownExtensions`, t);
 }
 
@@ -61,8 +70,8 @@ export function getKnownExtensions(context: vscode.ExtensionContext) {
   return <{ id: string; displayName: string }[]>context.globalState.get(`${EXTENSION_NAME}-knownExtensions`) || [];
 }
 
-export async function getInstalledExtensions(context: vscode.ExtensionContext): Promise<vscode.Extension<any>[]> {
+export async function getInstalledExtensions(context: vscode.ExtensionContext): Promise<{ id: string; displayName: string }[]> {
   const extensions = await _getInstalledExtensions();
   saveExtensionIdName(context, extensions);
-  return extensions;
+  return <{ id: string; displayName: string }[]>extensions;
 }

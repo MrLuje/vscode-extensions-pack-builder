@@ -24,7 +24,7 @@ export function SanitizePackageId(packageName: string) {
   return str;
 }
 
-export function SanitizePublisherId(username: string){
+export function SanitizePublisherId(username: string) {
   return dashify(username.trim());
 }
 
