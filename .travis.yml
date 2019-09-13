@@ -20,5 +20,5 @@ install:
   - npm run vscode:prepublish
 
 script:
-  - npm run test
+  - npm run test --verbose
   - cat /home/travis/.npm/_logs/*.log
