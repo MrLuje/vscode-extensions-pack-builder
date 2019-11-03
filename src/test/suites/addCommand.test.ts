@@ -1,8 +1,8 @@
 import * as assert from "assert";
 import * as sinon from "sinon";
-import * as packfactory from "../helpers/packFactory";
-import * as helpers from "../helpers";
-import { FnSelectExtensions } from "../helpers";
+import * as packfactory from "../../helpers/packFactory";
+import * as helpers from "../../helpers";
+import { FnSelectExtensions } from "../../helpers";
 import * as vscode from "vscode";
 
 suite("AddCommand ProcessPackCreation", function() {

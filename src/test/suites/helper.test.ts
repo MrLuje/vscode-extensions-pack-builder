@@ -1,5 +1,5 @@
 import * as assert from "assert";
-import { SanitizePackageId } from "../helpers";
+import { SanitizePackageId } from "../../helpers";
 
 suite("SanitizePackageId Tests", function() {
   test("Empty string returns empty", function() {
