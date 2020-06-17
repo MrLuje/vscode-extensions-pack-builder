@@ -51,6 +51,9 @@ suite("extensionList", function() {
     stubs.push(readFileStub);
     readFileStub.onFirstCall().returns(Promise.resolve(JSON.stringify(extension1)));
     readFileStub.onSecondCall().returns(Promise.resolve(JSON.stringify(extension2)));
+    const existsStub = sinon.stub(prfs, "exists");
+    existsStub.returns(Promise.resolve(true));
+    stubs.push(existsStub);
 
     const handMadeInstalledExtensions = await extensionList.getInstalledExtensions(<vscode.ExtensionContext>vsCodeContext());
     assert.equal(handMadeInstalledExtensions.filter(e => e.id.includes(".internal")).length, 1);
@@ -67,6 +70,9 @@ suite("extensionList", function() {
     const readFileStub = sinon.stub(prfs, "readFile");
     stubs.push(readFileStub);
     readFileStub.returns(Promise.resolve(JSON.stringify(extension1)));
+    const existsStub = sinon.stub(prfs, "exists")
+    existsStub.returns(Promise.resolve(true));
+    stubs.push(existsStub);
 
     const handMadeInstalledExtensions = await extensionList.getInstalledExtensions(<vscode.ExtensionContext>vsCodeContext());
     assert.ok(handMadeInstalledExtensions.every(x => x.displayName.includes(expectedDisplayName)));
