@@ -1,0 +1,32 @@
+name: Publish on tags
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10.x
+    - run: npm install
+    - name: Run tests
+      uses: GabrielBB/xvfb-action@v1.2
+      with:
+        run: npm test
+
+  deploy:
+    needs: tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Push extension
+      run: npm run publish-market
+      # with:
+      #     args: -p ${{ secrets.VSCE_TOKEN }}
