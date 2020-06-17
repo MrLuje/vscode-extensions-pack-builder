@@ -63,6 +63,7 @@
         "sinon": "^6.1.5",
         "tslint": "^5.8.0",
         "typescript": "^3.6.2",
+        "vsce": "^1.77.0",
         "vscode-test": "^1.2.0"
     },
     "dependencies": {

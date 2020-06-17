@@ -45,7 +45,7 @@ export async function CreatePack(context: vscode.ExtensionContext) {
       .map(ext => {
         return {
           id: ext.id,
-          label: (ext as any).displayName
+          label: ext.displayName
         };
       })
       .sort((a: { label: string }, b: { label: string }) => a.label.localeCompare(b.label)),
