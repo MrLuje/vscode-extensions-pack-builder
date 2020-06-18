@@ -39,14 +39,14 @@
         ]
     },
     "scripts": {
-        "vscode:prepublish": "rimraf ./out && webpack --mode production",
+        "vscode:prepublish": "webpack --mode production",
         "compile": "tsc -p ./",
-        "watch": "npm run copy_files && tsc -watch -p ./",
+        "clean": "rimraf ./out ",
+        "watch": "npm run clean && npm run copy_files && tsc -watch -p ./",
         "copy_files": "copyfiles -f src/extension_readme.md src/extension_package.json images/pack_icon.png out",
         "pretest": "npx cpx \"./src/test/workspaces/**/*.*\" ./out/test/workspaces",
         "test": "npm run compile && node ./out/test/runTest.js",
-        "build": "vsce package -o ./out/vscode-extensions-pack-builder.vsix",
-        "publish-market": "vsce publish --packagePath ./out/vscode-extensions-pack-builder.vsix"
+        "publish-market": "vsce package -o ./out/vscode-extensions-pack-builder.vsix && vsce publish --packagePath ./out/vscode-extensions-pack-builder.vsix"
     },
     "devDependencies": {
         "@types/dashify": "^1.0.0",
