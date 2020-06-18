@@ -25,7 +25,6 @@ steps:
 
 - script: |
     npm install
-    npm run vscode:prepublish
   displayName: 'npm install and build'
 
 - script: |
