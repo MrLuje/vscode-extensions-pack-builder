@@ -2,7 +2,7 @@
     "name": "vscode-extensions-pack-builder",
     "displayName": "Extensions Pack builder",
     "description": "Easily create extensions packs so you can have only the relevant extensions enabled for a given project.",
-    "version": "0.1.2",
+    "version": "0.1.4",
     "publisher": "mrluje",
     "license": "MIT",
     "engines": {
