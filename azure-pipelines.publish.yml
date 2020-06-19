@@ -3,6 +3,8 @@ trigger:
     include:
       - v*
 
+pr: none
+
 strategy:
   matrix:
     linux:
