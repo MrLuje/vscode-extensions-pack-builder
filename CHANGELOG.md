@@ -2,6 +2,11 @@
 
 All notable changes to the "vscode-extensions-pack-builder" extension will be documented in this file.
 
+## [0.1.5]
+
+- All filesystem operations are not async
+- Upgrade typescript
+
 ## [0.1.4]
 
 - fix: some extensions were displayed as %displayName%
