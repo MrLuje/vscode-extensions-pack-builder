@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import {prfs} from "../node_async/fs";
+import { prfs } from "../node_async/fs";
 import * as path from "path";
 import { EXTENSION_FOLDER } from "../const";
 import { Extension } from "../models";
