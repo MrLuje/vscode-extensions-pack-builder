@@ -26,7 +26,7 @@ const getDisplayName = (jsonObj: { name: string; displayName: string }) =>
 
 export type vsCodeExtension = Omit<
   vscode.Extension<any>,
-  "extensionKind" | "activate" | "export"
+  "extensionKind" | "activate" | "export" | "extensionUri"
 > & { displayName: string | undefined };
 export type vsCodeExtensionDisplay = Omit<
   vsCodeExtension,
