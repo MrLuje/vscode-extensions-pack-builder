@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import * as fs from "fs";
+import {prfs} from "../node_async/fs";
 import * as path from "path";
 import { EXTENSION_FOLDER } from "../const";
 import { Extension } from "../models";
@@ -50,13 +50,13 @@ export async function EditPack(context: vscode.ExtensionContext) {
   }
 
   const factoryFolder = path.join(storagePath, EXTENSION_FOLDER);
-  if (!fs.existsSync(factoryFolder)) {
+  if (!(await prfs.exists(factoryFolder))) {
     vscode.window.showErrorMessage(`You didn't create any pack yet :(`);
     return;
   }
 
   const installedExtensions$ = getInstalledExtensions(context);
-  const existingPacks = getExistingPacks(factoryFolder, context);
+  const existingPacks = await getExistingPacks(factoryFolder, context);
 
   const [selectedPack, installedExtensions] = await Promise.all([vscode.window.showQuickPick(existingPacks), installedExtensions$]);
   const validatePack = (pack: ExtensionPack | undefined): pack is ExtensionPack => !!pack;
@@ -90,31 +90,30 @@ export async function EditPack(context: vscode.ExtensionContext) {
   ProcessPackCreation(options);
 }
 
-function getExistingPacks(factoryFolder: string, context: vscode.ExtensionContext) {
-  const toNormalizedItem = (f: string) => {
+async function getExistingPacks(factoryFolder: string, context: vscode.ExtensionContext) {
+  const toNormalizedItem = async (f: string) => {
     const fullpath = path.join(factoryFolder, f);
-    return { name: f, fullpath: fullpath, isDir: fs.lstatSync(fullpath).isDirectory() };
+    const isDir = (await prfs.lstat(fullpath)).isDirectory();
+    return { name: f, fullpath: fullpath, isDir: isDir };
   };
 
-  const readAndSearchPackageJson = (fullpath: string) => {
-    return { path: fullpath, content: fs.readdirSync(fullpath).filter(ff => ff === "package.json") };
+  const readAndSearchPackageJson = async (fullpath: string) => {
+    return { path: fullpath, content: (await prfs.readdir(fullpath)).filter(ff => ff === "package.json") };
   };
 
-  const parseJson = (fullpath: string) => JSON.parse(fs.readFileSync(fullpath, { encoding: "UTF-8" }));
+  const parseJson = async (fullpath: string) => JSON.parse((await prfs.readFile(fullpath, { encoding: "UTF-8" })));
 
-  const packageJsons = fs
-    .readdirSync(factoryFolder)
-    .filter(f => f !== "node_modules")
-    .map(toNormalizedItem)
+  const contentOfFactoryFolder = (await prfs.readdir(factoryFolder)).filter(f => f !== "node_modules");
+  const folders = (await Promise.all(contentOfFactoryFolder.map(async f => toNormalizedItem(f))))
     .filter(f => f.isDir)
-    .map(f => f.fullpath)
-    .map(readAndSearchPackageJson)
+    .map(f => f.fullpath);
+  const packageJsonPaths = (await Promise.all(folders.map(async f => readAndSearchPackageJson(f))))
     .filter(f => f.content.length > 0)
     .map(f => path.join(f.path, f.content[0]))
-    .reduce((prev: string[], curr) => prev.concat(curr), [])
-    .map(parseJson);
+    .reduce((prev: string[], curr) => prev.concat(curr), []);
+  const packageJsonContents = await Promise.all(packageJsonPaths.map(async f => parseJson(f)));
 
-  const existingPacks = packageJsons.map(pj => {
+  const existingPacks = packageJsonContents.map(pj => {
     return <ExtensionPack>{
       label: pj.displayName,
       name: pj.name,
