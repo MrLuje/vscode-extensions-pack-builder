@@ -41,3 +41,9 @@ steps:
   displayName: 'publish to marketplace'
   env:
     vsceToken: $(VSCE_TOKEN)
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: './out/vscode-extensions-pack-builder.vsix'
+    ArtifactName: 'package'
+    publishLocation: 'Container'
