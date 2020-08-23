@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import * as fs from "fs";
+import {prfs} from "../node_async/fs";
 import * as path from "path";
 import * as os from "os";
 import { child_process } from "../node_async/child_process";
@@ -11,23 +11,23 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
   const extensionDisplayName = options.packageName;
   const extensionTemplatePath = path.join(options.factoryFolder, options.packageId);
 
-  if (!fs.existsSync(options.factoryFolder)) {
-    fs.mkdirSync(options.factoryFolder);
+  if (!(await prfs.exists(options.factoryFolder))) {
+    await prfs.mkdir(options.factoryFolder);
   }
 
   // install extension generator
-  if (!fs.existsSync(path.join(options.factoryFolder, "node_modules"))) {
+  if (!(await prfs.exists(path.join(options.factoryFolder, "node_modules")))) {
     log.appendLine(`  - Installing generators...`);
     await child_process.exec("npm i yo https://github.com/mrluje/vscode-generator-code.git#fix", { cwd: options.factoryFolder });
   }
 
-  if (!fs.existsSync(path.join(extensionTemplatePath, "README.md"))) {
+  if (!(await prfs.exists(path.join(extensionTemplatePath, "README.md")))) {
     // generate extension
     let cmd = `node_modules${path.sep}.bin${path.sep}yo code --extensionName="${
       options.packageId
-    }" --extensionDescription="Template to build extension packs" --extensionType=extensionpack --extensionDisplayName="${extensionDisplayName}" --extensionPublisher="${
+      }" --extensionDescription="Template to build extension packs" --extensionType=extensionpack --extensionDisplayName="${extensionDisplayName}" --extensionPublisher="${
       options.publisher
-    }" --extensionParam="n"`;
+      }" --extensionParam="n"`;
 
     try {
       log.appendLine(`  - Generating the template...`);
@@ -38,23 +38,33 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
     }
   }
 
-  log.appendLine(`  - Copying icon...`);
-  fs.copyFileSync(path.join(options.extensionPath, "out", "pack_icon.png"), path.join(extensionTemplatePath, "pack_icon.png"));
+  try {
+    log.appendLine(`  - Copying icon...`);
+    await prfs.copyFile(path.join(options.extensionPath, "out", "pack_icon.png"), path.join(extensionTemplatePath, "pack_icon.png"), undefined);
+  } catch (err) {
+    vscode.window.showErrorMessage("Failed to generate the pack...", err);
+    return false;
+  }
 
   log.appendLine(`  - Updating readme.md...`);
 
-  let rd = fs.readFileSync(path.join(options.extensionPath, "out", "extension_readme.md"), "UTF-8");
-  rd = rd
-    .replace("%packageName%", options.packageName)
-    .replace(
-      "%extension-list%",
-      options.extensions.map(ext => `${ext.label} (${ext.id})`).reduce((prev, cur, i) => (prev += `- ${cur}${os.EOL}`), "")
-    );
-  fs.writeFileSync(path.join(extensionTemplatePath, "README.md"), rd);
+  try {
+    let rd = await prfs.readFile(path.join(options.extensionPath, "out", "extension_readme.md"), "UTF-8");
+    rd = rd
+      .replace("%packageName%", options.packageName)
+      .replace(
+        "%extension-list%",
+        options.extensions.map(ext => `${ext.label} (${ext.id})`).reduce((prev, cur, i) => (prev += `- ${cur}${os.EOL}`), "")
+      );
+    await prfs.writeFile(path.join(extensionTemplatePath, "README.md"), rd, "UTF-8");
+  } catch (err) {
+    vscode.window.showErrorMessage("Failed to generate the pack...", err);
+    return false;
+  }
 
   log.appendLine(`  - Updating package.json...`);
 
-  let pkJson = fs.readFileSync(path.join(options.extensionPath, "out", "extension_package.json"), "UTF-8");
+  let pkJson = await prfs.readFile(path.join(options.extensionPath, "out", "extension_package.json"), "UTF-8");
   pkJson = pkJson
     .replace("#extension-name#", options.packageId.replace(".", ""))
     .replace("#extension-displayname#", options.packageName)
@@ -65,11 +75,11 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
   packageJson.repository = extensionTemplatePath;
   packageJson.icon = "pack_icon.png";
 
-  fs.writeFileSync(path.join(extensionTemplatePath, "package.json"), JSON.stringify(packageJson), "UTF-8");
+  await prfs.writeFile(path.join(extensionTemplatePath, "package.json"), JSON.stringify(packageJson), "UTF-8");
 
   log.appendLine(`  - Preparing build folder...`);
-  if (!fs.existsSync(path.join(extensionTemplatePath, "build"))) {
-    fs.mkdirSync(path.join(extensionTemplatePath, "build"));
+  if (!(await prfs.exists(path.join(extensionTemplatePath, "build")))) {
+    await prfs.mkdir(path.join(extensionTemplatePath, "build"));
   }
 
   return true;

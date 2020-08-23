@@ -4,6 +4,7 @@ import * as extensionList from "../../helpers/extensionList";
 import * as extensionProvider from "../../helpers/extensionProvider";
 import * as sinon from "sinon";
 import { prfs } from "../../node_async/fs";
+import { Uri } from "vscode";
 
 suite("extensionList", function() {
   let vsCodeContext: sinon.SinonSpy;
@@ -33,6 +34,7 @@ suite("extensionList", function() {
       activate: () => Promise.resolve({}),
       exports: undefined,
       extensionKind: vscode.ExtensionKind.UI,
+      extensionUri: Uri.parse("file://here"),
       isActive: true,
       packageJSON: "",
       extensionPath: path

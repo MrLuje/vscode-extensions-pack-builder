@@ -18,6 +18,7 @@
             "name": "Extension Tests",
             "type": "extensionHost",
             "request": "launch",
+            "preLaunchTask": "npm: pretest",
             "runtimeExecutable": "${execPath}",
             "args": ["--extensionDevelopmentPath=${workspaceFolder}", "--extensionTestsPath=${workspaceFolder}/out/test/suites/index"],
             "outFiles": ["${workspaceFolder}/out/test/**/*.js"]
