@@ -1,5 +1,6 @@
 import { promisify } from "util";
 import * as fs from "fs";
+import rimraf = require("rimraf");
 
 const copyFile = promisify(fs.copyFile);
 const exists = promisify(fs.exists);
@@ -9,6 +10,8 @@ const readdir = promisify(fs.readdir);
 const readFile = promisify(fs.readFile);
 const stat = promisify(fs.stat);
 const writeFile = promisify(fs.writeFile);
+const unlink = promisify(fs.unlink);
+const rimrafFunc = promisify(rimraf);
 
-const prfs = { stat, mkdir, readFile, readdir, exists, copyFile, writeFile, lstat };
+const prfs = { stat, mkdir, readFile, readdir, exists, copyFile, writeFile, lstat, unlink, rimraf: rimrafFunc };
 export { prfs };

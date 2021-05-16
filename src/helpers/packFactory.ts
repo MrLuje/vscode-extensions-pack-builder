@@ -143,3 +143,37 @@ export function ProcessPackCreation(options: PackOptions) {
     }
   );
 }
+
+async function DeleteNodeModules(factoryFolder: string) {
+  const nodeModulesPath = path.join(factoryFolder, "node_modules");
+  if (await prfs.exists(nodeModulesPath)) {
+    log.appendLine(`  - Deleting node_modules...`);
+    try {
+      await prfs.rimraf(nodeModulesPath);
+    } catch (err) {
+      log.appendLine(err);
+      vscode.window.showErrorMessage("Failed to delete node_modules folder...", { title: "Show logs" }).then(maybeShowLogPanel);
+      return false;
+    }
+  }
+  return true;
+}
+
+async function DeleteFile(factoryFolder: string, fileName: string) {
+  const packageLockPath = path.join(factoryFolder, fileName);
+  if (await prfs.exists(packageLockPath)) {
+    log.appendLine(`  - Deleting ${fileName}...`);
+    try {
+      await prfs.unlink(packageLockPath);
+    } catch (err) {
+      log.appendLine(err);
+      vscode.window.showErrorMessage(`Failed to delete ${fileName} file...`, { title: "Show logs" }).then(maybeShowLogPanel);
+      return false;
+    }
+  }
+}
+
+export async function ResetExtensionPackFactory(factoryFolder: string) {
+  await DeleteNodeModules(factoryFolder);
+  await DeleteFile(factoryFolder, "package-lock.json");
+}
