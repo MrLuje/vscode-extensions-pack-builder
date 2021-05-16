@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import {prfs} from "../node_async/fs";
+import { prfs } from "../node_async/fs";
 import * as path from "path";
 import * as os from "os";
 import { child_process } from "../node_async/child_process";
@@ -23,17 +23,16 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
 
   if (!(await prfs.exists(path.join(extensionTemplatePath, "README.md")))) {
     // generate extension
-    let cmd = `node_modules${path.sep}.bin${path.sep}yo code --extensionName="${
-      options.packageId
-      }" --extensionDescription="Template to build extension packs" --extensionType=extensionpack --extensionDisplayName="${extensionDisplayName}" --extensionPublisher="${
-      options.publisher
+    let cmd = `node_modules${path.sep}.bin${path.sep}yo code --extensionName="${options.packageId
+      }" --extensionDescription="Template to build extension packs" --extensionType=extensionpack --extensionDisplayName="${extensionDisplayName}" --extensionPublisher="${options.publisher
       }" --extensionParam="n"`;
 
     try {
       log.appendLine(`  - Generating the template...`);
       await child_process.exec(cmd, { cwd: options.factoryFolder });
     } catch (err) {
-      vscode.window.showErrorMessage("Failed to generate the pack...", err);
+      log.appendLine(err);
+      vscode.window.showErrorMessage("Failed to initialize the template...", { title: "Show logs" }).then(maybeShowLogPanel);
       return false;
     }
   }
@@ -42,7 +41,8 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
     log.appendLine(`  - Copying icon...`);
     await prfs.copyFile(path.join(options.extensionPath, "out", "pack_icon.png"), path.join(extensionTemplatePath, "pack_icon.png"), undefined);
   } catch (err) {
-    vscode.window.showErrorMessage("Failed to generate the pack...", err);
+    log.appendLine(err);
+    vscode.window.showErrorMessage("Failed to copy default icon...", { title: "Show logs" }).then(maybeShowLogPanel);
     return false;
   }
 
@@ -58,7 +58,8 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
       );
     await prfs.writeFile(path.join(extensionTemplatePath, "README.md"), rd, "UTF-8");
   } catch (err) {
-    vscode.window.showErrorMessage("Failed to generate the pack...", err);
+    log.appendLine(err);
+    vscode.window.showErrorMessage("Failed to update README.md file...", { title: "Show logs" }).then(maybeShowLogPanel);
     return false;
   }
 
@@ -83,6 +84,15 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
   }
 
   return true;
+}
+
+function maybeShowLogPanel(value: { title: string; } | undefined) {
+  if (!value)
+    return;
+  const { title } = value;
+  if (title === "Show logs") {
+    log.show();
+  }
 }
 
 export function PackageExtension(extensionPath: string, extensionName: string) {
@@ -111,7 +121,8 @@ export function ProcessPackCreation(options: PackOptions) {
       try {
         packSuccess = await PackageExtension(path.join(options.factoryFolder, options.packageId), options.packageId);
       } catch (err) {
-        vscode.window.showErrorMessage("Failed to generate the pack...\n" + err);
+        log.appendLine(err);
+        vscode.window.showErrorMessage("Failed to generate the pack...", { title: "Show logs" }).then(maybeShowLogPanel);
       }
       if (!packSuccess || token.isCancellationRequested) {
         return;
@@ -124,7 +135,9 @@ export function ProcessPackCreation(options: PackOptions) {
       try {
         await InstallVSIX(vscode.Uri.file(path.join(options.factoryFolder, options.packageId, "build", `${options.packageId}.vsix`)));
       } catch (err) {
-        vscode.window.showErrorMessage("Failed to install the pack...\n" + err);
+        log.appendLine(err);
+        vscode.window.showErrorMessage("Failed to install the pack...", { title: "Show logs" }).then(maybeShowLogPanel);
+        return;
       }
       log.appendLine(` Done`);
     }
