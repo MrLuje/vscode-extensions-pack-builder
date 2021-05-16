@@ -1,6 +1,6 @@
 # VS Code Extensions Pack builder
 
-[![Build Status](https://mrluje-git.visualstudio.com/vscode-extensions-pack-builder/_apis/build/status/MrLuje.vscode-extensions-pack-builder?branchName=master)](https://mrluje-git.visualstudio.com/vscode-extensions-pack-builder/_apis/build/status/MrLuje.vscode-extensions-pack-builder?branchName=master)
+[![Build Status](https://dev.azure.com/mrluje-git/vscode-extensions-pack-builder/_apis/build/status/MrLuje.vscode-extensions-pack-builder?branchName=refs%2Fpull%2F32%2Fmerge)](https://dev.azure.com/mrluje-git/vscode-extensions-pack-builder/_apis/build/status/MrLuje.vscode-extensions-pack-builder?branchName=refs%2Fpull%2F32%2Fmerge)
 
 TL;DR: You can define groups of extensions that you can apply per project, eg :
 
@@ -19,16 +19,16 @@ Since July update, extension packs are way more powerful and enabling/disabling 
 - Create new extensions packs
   - Select which extensions goes in it
   - Created pack is automatically installed
-  
+
 - Edit an existing extension pack
   - Add/Remove extensions from it
   - Get it installed in one click
 
-![feature create pack](/images/demo.gif)
+![feature create pack](./images/demo.gif)
 
-[Demo enabling a shared and typescript pack](/images/demo-typescript.gif)
+[Demo enabling a shared and typescript pack](./images/demo-typescript.gif)
 
-[Demo going from a typescript workspace to a .net one](/images/demo-typescript-to-dotnet.gif)
+[Demo going from a typescript workspace to a .net one](./images/demo-typescript-to-dotnet.gif)
 
 ## Prerequites
 
@@ -59,5 +59,6 @@ Not really an issue but good to know, **Node Debug** (ms-vscode.node-debug2) ext
 ## Build
 
 ```bash
-npm run watch
+- npm install
+- npm run watch
 ```
