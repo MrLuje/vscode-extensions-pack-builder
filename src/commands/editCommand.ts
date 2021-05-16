@@ -78,7 +78,7 @@ export async function EditPack(context: vscode.ExtensionContext) {
     packageName: selectedPack.label,
     publisher: selectedPack.publisher,
     extensions: selectedExtensions,
-    factoryFolder: path.join(storagePath, EXTENSION_FOLDER),
+    factoryFolder: factoryFolder,
     extensionPath: context.extensionPath
   };
 
