@@ -50,7 +50,7 @@ suite("EditCommand ProcessPackCreation", function() {
 
     await vscode.commands.executeCommand("packBuilder.editPack");
 
-    assert.equal(processPackCreationStub.calledOnce, false);
+    assert.strictEqual(processPackCreationStub.calledOnce, false);
     sinon.assert.calledWithMatch(quickPickStub, [{ name: "p1", label: "P1", publisher: "myself", extensions: ["p2", "p3"] }]);
   });
 });
@@ -73,7 +73,7 @@ suite("preSelectAndFormatExtensionList", function() {
         return { ...e, displayName: e.id };
       });
     const extensionsReadyForPick = preSelectAndFormatExtensionList(<vscode.ExtensionContext>{}, installedExtensions, selectedPack);
-    assert.equal(installedExtensions.length, extensionsReadyForPick.length);
+    assert.strictEqual(installedExtensions.length, extensionsReadyForPick.length);
   });
 
   test("Should returns all extensions unpicked if no selectedPack", function() {
@@ -84,7 +84,7 @@ suite("preSelectAndFormatExtensionList", function() {
       });
     const selectedPack: ExtensionPack = { name: "", label: "", extensions: [], publisher: "" };
     const extensionsReadyForPick = preSelectAndFormatExtensionList(<vscode.ExtensionContext>{}, installedExtensions, selectedPack);
-    assert.equal(extensionsReadyForPick.filter(e => e.picked).length, 0);
+    assert.strictEqual(extensionsReadyForPick.filter(e => e.picked).length, 0);
   });
 
   test("Should returns pick extensions from selectedPack", function() {
@@ -95,8 +95,8 @@ suite("preSelectAndFormatExtensionList", function() {
       });
     const selectedPack: ExtensionPack = { name: "", label: "", extensions: [installedExtensions[0].id], publisher: "" };
     const extensionsReadyForPick = preSelectAndFormatExtensionList(<vscode.ExtensionContext>{}, installedExtensions, selectedPack);
-    assert.equal(extensionsReadyForPick.filter(e => e.picked).length, 1);
-    assert.equal(extensionsReadyForPick.filter(e => e.picked)[0].id, installedExtensions[0].id);
+    assert.strictEqual(extensionsReadyForPick.filter(e => e.picked).length, 1);
+    assert.strictEqual(extensionsReadyForPick.filter(e => e.picked)[0].id, installedExtensions[0].id);
   });
 
   test("Should add label from unknown extensions using getKnownExtensions", function() {
@@ -115,7 +115,7 @@ suite("preSelectAndFormatExtensionList", function() {
 
     const extensionsReadyForPick = preSelectAndFormatExtensionList(<vscode.ExtensionContext>{}, installedExtensions, selectedPack);
 
-    assert.equal(extensionsReadyForPick.filter(e => e.id === "vscode-poney")[0].label, "Who doesn't love poney...");
+    assert.strictEqual(extensionsReadyForPick.filter(e => e.id === "vscode-poney")[0].label, "Who doesn't love poney...");
   });
 
   test("Should not do anything for unmatched extensions", function() {
@@ -129,6 +129,6 @@ suite("preSelectAndFormatExtensionList", function() {
 
     const extensionsReadyForPick = preSelectAndFormatExtensionList(<vscode.ExtensionContext>{}, installedExtensions, selectedPack);
 
-    assert.equal(extensionsReadyForPick.filter(e => e.label === "Who doesn't love poney...").length, 0);
+    assert.strictEqual(extensionsReadyForPick.filter(e => e.label === "Who doesn't love poney...").length, 0);
   });
 });

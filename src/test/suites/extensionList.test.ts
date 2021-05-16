@@ -58,8 +58,8 @@ suite("extensionList", function() {
     stubs.push(existsStub);
 
     const handMadeInstalledExtensions = await extensionList.getInstalledExtensions(<vscode.ExtensionContext>vsCodeContext());
-    assert.equal(handMadeInstalledExtensions.filter(e => e.id.includes(".internal")).length, 1);
-    assert.equal(handMadeInstalledExtensions.filter(e => e.id.includes("non-internal")).length, 0);
+    assert.strictEqual(handMadeInstalledExtensions.filter(e => e.id.includes(".internal")).length, 1);
+    assert.strictEqual(handMadeInstalledExtensions.filter(e => e.id.includes("non-internal")).length, 0);
   });
 
   test("DisplayName should use displayName and fallback to name", async function() {

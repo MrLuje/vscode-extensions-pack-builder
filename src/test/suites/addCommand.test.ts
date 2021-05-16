@@ -41,7 +41,7 @@ suite("AddCommand ProcessPackCreation", function() {
     this.timeout("10s");
     await vscode.commands.executeCommand("packBuilder.createPack");
 
-    assert.equal(processPackCreationStub.calledOnce, true);
+    assert.strictEqual(processPackCreationStub.calledOnce, true);
     sinon.assert.calledWithMatch(processPackCreationStub, { extensions: [firstExtension] });
   });
 
@@ -50,7 +50,7 @@ suite("AddCommand ProcessPackCreation", function() {
     inputBoxStub.resolves("");
 
     await vscode.commands.executeCommand("packBuilder.createPack");
-    assert.equal(processPackCreationStub.called, false);
+    assert.strictEqual(processPackCreationStub.called, false);
   });
 
   test("No extensions selected should quit the procedure", async function() {
@@ -60,7 +60,7 @@ suite("AddCommand ProcessPackCreation", function() {
     });
 
     await vscode.commands.executeCommand("packBuilder.createPack");
-    assert.equal(processPackCreationStub.called, false);
+    assert.strictEqual(processPackCreationStub.called, false);
   });
 
   test("Should use git username if available", async function() {
