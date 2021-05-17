@@ -2,6 +2,7 @@ import * as assert from "assert";
 import * as sinon from "sinon";
 import * as installExtension from "../../helpers/installExtension";
 import * as helpers from "../../helpers";
+import {log} from "../../helpers/log";
 import { FnSelectExtensions } from "../../helpers";
 import * as vscode from "vscode";
 
@@ -10,6 +11,7 @@ suite("[integrationtest] AddCommand", function () {
   var quickPickStub: sinon.SinonStub;
   var inputBoxStub: sinon.SinonStub;
   var showErrorMessageStub: sinon.SinonStub;
+  var loggerStub: sinon.SinonStub;
   var getGitUserNameStub: sinon.SinonStub;
   const expectedPackageName = "packname";
   const expectedGitUserName = "name";
@@ -29,7 +31,10 @@ suite("[integrationtest] AddCommand", function () {
       saveFn([exts[0]]);
     });
 
-    showErrorMessageStub = sinon.stub(vscode.window, "showErrorMessage");
+    loggerStub = sinon.stub(log, "appendLine");
+    loggerStub.callsFake(str => console.info(`[info] ${str}`));
+
+    showErrorMessageStub = sinon.stub(vscode.window, "showInformationMessage");
 
     inputBoxStub = sinon.stub(vscode.window, "showInputBox");
     inputBoxStub.resolves(expectedPackageName);
@@ -47,7 +52,7 @@ suite("[integrationtest] AddCommand", function () {
   });
 
   test("ProcessPackCreation", async function () {
-    this.timeout("100s");
+    this.timeout("300s");
     await vscode.commands.executeCommand("packBuilder.createPack");
 
     let file: vscode.Uri = await installPromise;
