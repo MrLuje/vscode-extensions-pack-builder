@@ -36,6 +36,12 @@ steps:
     DISPLAY: ':99.0'
 
 - script: |
+    npm run testintegration --silent
+  displayName: npm testintegration
+  env:
+    DISPLAY: ':99.0'
+
+- script: |
     npm run clean
     npm run publish-market -- -p $vsceToken
   displayName: 'publish to marketplace'
