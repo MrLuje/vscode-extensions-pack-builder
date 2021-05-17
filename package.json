@@ -45,7 +45,7 @@
         ]
     },
     "scripts": {
-        "vscode:prepublish": "webpack --mode production",
+        "vscode:prepublish": "npm run copy_files && webpack --mode production",
         "compile": "tsc -p ./",
         "clean": "rimraf ./out ",
         "watch": "npm run clean && npm run copy_files && tsc -watch -p ./",
