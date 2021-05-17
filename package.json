@@ -52,6 +52,7 @@
         "copy_files": "copyfiles -f src/extension_readme.md src/extension_package.json images/pack_icon.png out",
         "pretest": "npx cpx \"./src/test/workspaces/**/*.*\" ./out/test/workspaces",
         "test": "npm run compile && node ./out/test/runTest.js",
+        "testintegration": "npm run compile && node ./out/test/runTestIntegration.js",
         "publish-market": "vsce package -o ./out/vscode-extensions-pack-builder.vsix && vsce publish --packagePath ./out/vscode-extensions-pack-builder.vsix"
     },
     "devDependencies": {
