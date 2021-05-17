@@ -16,8 +16,10 @@ suite("[integrationtest] AddCommand", function () {
   const expectedPackageName = "packname";
   const expectedGitUserName = "name";
   let resolve = (s: vscode.Uri) => { };
+  let reject = (reason: any) => { };
   let installPromise = new Promise<vscode.Uri>((ok, nok) => {
     resolve = (s) => ok(s);
+    reject = (r) => nok(r);
   });
 
   setup(() => {
@@ -34,7 +36,10 @@ suite("[integrationtest] AddCommand", function () {
     loggerStub = sinon.stub(log, "appendLine");
     loggerStub.callsFake(str => console.info(`[info] ${str}`));
 
-    showErrorMessageStub = sinon.stub(vscode.window, "showInformationMessage");
+    showErrorMessageStub = sinon.stub(vscode.window, "showErrorMessage");
+    showErrorMessageStub.callsFake((msg, opts) => {
+      reject(msg);
+    });
 
     inputBoxStub = sinon.stub(vscode.window, "showInputBox");
     inputBoxStub.resolves(expectedPackageName);
