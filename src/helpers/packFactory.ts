@@ -12,6 +12,7 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
   const extensionTemplatePath = path.join(options.factoryFolder, options.packageId);
 
   if (!(await prfs.exists(options.factoryFolder))) {
+    log.appendLine(`  - Creating factory folder...`);
     await prfs.mkdir(options.factoryFolder);
   }
 
