@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { prfs } from "../node_async/fs";
+import { existsSync } from "fs";
 import * as path from "path";
 import * as os from "os";
 import { child_process } from "../node_async/child_process";
@@ -11,18 +12,18 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
   const extensionDisplayName = options.packageName;
   const extensionTemplatePath = path.join(options.factoryFolder, options.packageId);
 
-  if (!(await prfs.exists(options.factoryFolder))) {
+  if (!(existsSync(options.factoryFolder))) {
     log.appendLine(`  - Creating factory folder...`);
     await prfs.mkdir(options.factoryFolder);
   }
 
   // install extension generator
-  if (!(await prfs.exists(path.join(options.factoryFolder, "node_modules")))) {
+  if (!(existsSync(path.join(options.factoryFolder, "node_modules")))) {
     log.appendLine(`  - Installing generators...`);
     await child_process.exec("npm i yo https://github.com/mrluje/vscode-generator-code.git#fix", { cwd: options.factoryFolder });
   }
 
-  if (!(await prfs.exists(path.join(extensionTemplatePath, "README.md")))) {
+  if (!(existsSync(path.join(extensionTemplatePath, "README.md")))) {
     // generate extension
     let cmd = `node_modules${path.sep}.bin${path.sep}yo code --extensionName="${options.packageId
       }" --extensionDescription="Template to build extension packs" --extensionType=extensionpack --extensionDisplayName="${extensionDisplayName}" --extensionPublisher="${options.publisher
@@ -80,7 +81,7 @@ export async function EnsureExtensionPackFactory(options: PackOptions) {
   await prfs.writeFile(path.join(extensionTemplatePath, "package.json"), JSON.stringify(packageJson), "UTF-8");
 
   log.appendLine(`  - Preparing build folder...`);
-  if (!(await prfs.exists(path.join(extensionTemplatePath, "build")))) {
+  if (!(existsSync(path.join(extensionTemplatePath, "build")))) {
     await prfs.mkdir(path.join(extensionTemplatePath, "build"));
   }
 
@@ -147,7 +148,7 @@ export function ProcessPackCreation(options: PackOptions) {
 
 async function DeleteNodeModules(factoryFolder: string) {
   const nodeModulesPath = path.join(factoryFolder, "node_modules");
-  if (await prfs.exists(nodeModulesPath)) {
+  if (existsSync(nodeModulesPath)) {
     log.appendLine(`  - Deleting node_modules...`);
     try {
       await prfs.rimraf(nodeModulesPath);
@@ -162,7 +163,7 @@ async function DeleteNodeModules(factoryFolder: string) {
 
 async function DeleteFile(factoryFolder: string, fileName: string) {
   const packageLockPath = path.join(factoryFolder, fileName);
-  if (await prfs.exists(packageLockPath)) {
+  if (existsSync(packageLockPath)) {
     log.appendLine(`  - Deleting ${fileName}...`);
     try {
       await prfs.unlink(packageLockPath);

@@ -7,6 +7,7 @@ import { log } from "../helpers/log";
 import { ProcessPackCreation } from "../helpers/packFactory";
 import { CheckUserFolder, AskMultiple } from "../helpers";
 import { getInstalledExtensions, getKnownExtensions } from "../helpers/extensionList";
+import { existsSync } from "fs";
 
 export type ExtensionPack = {
   label: string;
@@ -50,7 +51,7 @@ export async function EditPack(context: vscode.ExtensionContext) {
   }
 
   const factoryFolder = path.join(storagePath, EXTENSION_FOLDER);
-  if (!(await prfs.exists(factoryFolder))) {
+  if (!(existsSync(factoryFolder))) {
     vscode.window.showErrorMessage(`You didn't create any pack yet :(`);
     return;
   }

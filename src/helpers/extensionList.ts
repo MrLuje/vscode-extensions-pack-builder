@@ -4,6 +4,7 @@ import { prfs } from "../node_async/fs";
 import { log } from "./log";
 import { EXTENSION_NAME } from "../const";
 import { getExtensions } from "./extensionProvider";
+import { existsSync } from "fs";
 
 const isValidExt = (ext: vsCodeExtension | undefined): ext is vsCodeExtension =>
   !!ext;
@@ -41,7 +42,7 @@ async function _getInstalledExtensions(): Promise<vsCodeExtension[]> {
 
     const arr = extensionsDirs.map(async (dir) => {
       const jsonPath = dirToJsonPath(extensionsDir, dir);
-      if (!(await prfs.exists(jsonPath))) {
+      if (!(existsSync(jsonPath))) {
         return undefined;
       }
 

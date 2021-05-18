@@ -4,6 +4,7 @@ import * as extensionList from "../../helpers/extensionList";
 import * as extensionProvider from "../../helpers/extensionProvider";
 import * as sinon from "sinon";
 import { prfs } from "../../node_async/fs";
+import * as fs from "fs";
 import { Uri } from "vscode";
 
 suite("extensionList", function() {
@@ -53,7 +54,7 @@ suite("extensionList", function() {
     stubs.push(readFileStub);
     readFileStub.onFirstCall().returns(Promise.resolve(JSON.stringify(extension1)));
     readFileStub.onSecondCall().returns(Promise.resolve(JSON.stringify(extension2)));
-    const existsStub = sinon.stub(prfs, "exists");
+    const existsStub = sinon.stub(fs, "existsSync");
     existsStub.returns(Promise.resolve(true));
     stubs.push(existsStub);
 
@@ -72,7 +73,7 @@ suite("extensionList", function() {
     const readFileStub = sinon.stub(prfs, "readFile");
     stubs.push(readFileStub);
     readFileStub.returns(Promise.resolve(JSON.stringify(extension1)));
-    const existsStub = sinon.stub(prfs, "exists")
+    const existsStub = sinon.stub(fs, "existsSync")
     existsStub.returns(Promise.resolve(true));
     stubs.push(existsStub);
 
