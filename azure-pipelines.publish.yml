@@ -30,6 +30,12 @@ steps:
   displayName: 'npm install and build'
 
 - script: |
+    npm run vscode:prepublish
+  displayName: pack extension
+  env:
+    DISPLAY: ':99.0'
+
+- script: |
     npm run test --silent
   displayName: npm test
   env:

@@ -27,8 +27,11 @@ steps:
 
 - script: |
     npm install
-    npm run vscode:prepublish
   displayName: 'npm install and build'
+
+- script: |
+    npm run vscode:prepublish
+  displayName: 'pack extension'
 
 - script: |
     npm run test --silent
