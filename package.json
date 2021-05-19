@@ -80,7 +80,7 @@
     "dependencies": {
         "dashify": "^2.0.0",
         "hoek": "^4.2.1",
-        "lodash": "^4.17.19",
+        "lodash": "^4.17.21",
         "rimraf": "^3.0.2",
         "sanitize-filename": "^1.6.1",
         "url-parse": "^1.5.0"
