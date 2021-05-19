@@ -16,7 +16,7 @@ pool:
 steps:
 - task: NodeTool@0
   inputs:
-    versionSpec: '8.x'
+    versionSpec: '14.x'
   displayName: 'Install Node.js'
 
 - bash: |
@@ -27,11 +27,21 @@ steps:
 
 - script: |
     npm install
-    npm run vscode:prepublish
   displayName: 'npm install and build'
+
+- script: |
+    npm run vscode:prepublish
+  displayName: 'pack extension'
 
 - script: |
     npm run test --silent
   displayName: npm test
   env:
     DISPLAY: ':99.0'
+
+- script: |
+    npm run testintegration --silent
+  displayName: npm testintegration
+  env:
+    DISPLAY: ':99.0'
+  condition: ne(variables['Agent.OS'], 'Linux') # Sad :(

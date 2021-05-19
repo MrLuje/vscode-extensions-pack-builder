@@ -28,14 +28,6 @@ export async function CreatePack(context: vscode.ExtensionContext) {
     return;
   }
 
-  // if (!packageNameRegex.test(packNameRaw)) {
-  //   let res = await vscode.window.showErrorMessage(`Invalid package name, only letters & numbers are allowed.`, { title: "Try again !" });
-  //   if (!res || res.title !== "Try again !") {
-  //     return;
-  //   }
-  //   await vscode.commands.executeCommand("packBuilder.createPack");
-  //   return;
-  // }
   let packName = packNameRaw;
   let selectedExtensions: Extension[] = [];
 

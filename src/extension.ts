@@ -5,6 +5,7 @@ import * as vscode from "vscode";
 import { log } from "./helpers/log";
 import { CreatePack } from "./commands/addCommand";
 import { EditPack } from "./commands/editCommand";
+import { ResetFactory } from "./commands/resetFactoryCommand";
 import { EXTENSION_NAME } from "./const";
 
 // this method is called when your extension is activated
@@ -16,8 +17,9 @@ export function activate(context: vscode.ExtensionContext) {
 
   let disposableCreatePack = vscode.commands.registerCommand("packBuilder.createPack", async () => CreatePack(context));
   let disposableEditPack = vscode.commands.registerCommand("packBuilder.editPack", async () => EditPack(context));
+  let resetFactory = vscode.commands.registerCommand("packBuilder.resetFactory", async () => ResetFactory(context));
 
-  context.subscriptions.push(disposableCreatePack, disposableEditPack);
+  context.subscriptions.push(disposableCreatePack, disposableEditPack, resetFactory);
 }
 
 // this method is called when your extension is deactivated

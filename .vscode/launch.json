@@ -18,11 +18,19 @@
             "name": "Extension Tests",
             "type": "extensionHost",
             "request": "launch",
-            "preLaunchTask": "npm: pretest",
             "runtimeExecutable": "${execPath}",
             "args": ["--extensionDevelopmentPath=${workspaceFolder}", "--extensionTestsPath=${workspaceFolder}/out/test/suites/index"],
-            "outFiles": ["${workspaceFolder}/out/test/**/*.js"]
-            // "preLaunchTask": "npm: watch"
+            "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+            "preLaunchTask": "npm: pretest"
+        },
+        {
+            "name": "Extension Integration Tests",
+            "type": "extensionHost",
+            "request": "launch",
+            "runtimeExecutable": "${execPath}",
+            "args": ["--extensionDevelopmentPath=${workspaceFolder}", "--extensionTestsPath=${workspaceFolder}/out/test/suites/index.integrationtest"],
+            "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+            "preLaunchTask": "npm: pretest"
         }
     ]
 }
