@@ -44,3 +44,4 @@ steps:
   displayName: npm testintegration
   env:
     DISPLAY: ':99.0'
+  condition: ne(variables['Agent.OS'], 'Linux') # Sad :(
